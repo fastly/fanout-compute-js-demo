@@ -305,10 +305,15 @@ export class AppController {
       this.updateQuestionInfoPassive(
         data.roomId,
         data.questionId,
-        data.questionText,
-        data.questionTimestamp,
-        data.author,
-        data.upVotes
+        {
+          questionText: data.questionText,
+          questionTimestamp: data.questionTimestamp,
+          author: data.author,
+          answerText: data.answerText,
+          answerTimestamp: data.answerTimestamp,
+          answerAuthor: data.answerAuthor,
+          upVotes: data.upVotes,
+        }
       );
       if(data.userInfo != null) {
         this.dispatch({
@@ -347,19 +352,19 @@ export class AppController {
   updateQuestionInfoPassive(
     roomId: string,
     questionId: string,
-    questionText: string,
-    questionTimestamp: Date,
-    author: string,
-    upVotes: string[],
+    data: any
   ) {
     this.dispatch({
       type: 'QUESTION_UPDATE_INFO',
       roomId,
       questionId,
-      questionText,
-      questionTimestamp,
-      author,
-      upVotes,
+      questionText: data.questionText,
+      questionTimestamp: data.questionTimestamp,
+      author: data.author,
+      answerText: data.answerText,
+      answerTimestamp: data.answerTimestamp,
+      answerAuthor: data.answerAuthor,
+      upVotes: data.upVotes,
     });
   }
   upVoteQuestionPassive(
