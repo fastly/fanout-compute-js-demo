@@ -19,7 +19,7 @@ type OpParam = {
 type Props = {
   label: string;
   params?: OpParam[];
-  exec: (input: Record<string, any>) => Promise<any>;
+  exec?: (input: Record<string, any>) => Promise<any>;
 }
 export function TestOperation(props: Props) {
   const {
@@ -94,10 +94,14 @@ export function TestOperation(props: Props) {
         </div>
       ))}
       <div>
-        <button onClick={async () => {
-          const result = await exec(values);
-          setResults(JSON.stringify(result, undefined, 2));
-        }}>Go</button>
+        {exec != null ? (
+          <button onClick={async () => {
+            const result = await exec(values);
+            setResults(JSON.stringify(result, undefined, 2));
+          }}>Go</button>
+        ) : (
+          <div>[In progress]</div>
+        )}
       </div>
       {results != null ? (
         <div className="TestOperation--result">
