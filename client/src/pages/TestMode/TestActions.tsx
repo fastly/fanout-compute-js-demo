@@ -27,11 +27,52 @@ export function TestActions() {
       </div>
 
       <div>
+        <TestOperation label="Add/Change Display Name for myself"
+                       params={[
+                         {paramName: 'displayName',},
+                       ]}
+        />
+      </div>
+
+      <div>
+        <TestOperation label="Add/Change Display Name for room"
+                       params={[
+                         {paramName: 'displayName',},
+                       ]}
+        />
+      </div>
+
+      <div>
+        <TestOperation label="Change room theme color"
+                       params={[
+                         {paramName: 'themeColor',},
+                       ]}
+        />
+      </div>
+
+      <div>
         <TestOperation label="Post Question"
                        params={[
                          {paramName: 'questionText',},
                        ]}
                        exec={async (params) => await actions.postQuestion(params.questionText)}
+        />
+      </div>
+
+      <div>
+        <TestOperation label="Reword Question"
+                       params={[
+                         {paramName: 'questionId',},
+                         {paramName: 'questionText',},
+                       ]}
+        />
+      </div>
+
+      <div>
+        <TestOperation label="Answer Question (host)"
+                       params={[
+                         {paramName: 'answerText',},
+                       ]}
         />
       </div>
 
