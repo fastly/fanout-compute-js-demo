@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "module": "es2020",
+    "moduleResolution": "node16",
+    "lib": [
+      "dom",
+      "es2020"
+    ],
+    "strict": true,
+    "sourceMap": true,
+    "target": "es2020",
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "references": [
+    { "path": "../data", }
+  ]
+}

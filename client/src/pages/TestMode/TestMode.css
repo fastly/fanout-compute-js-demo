@@ -1,0 +1,25 @@
+.TestMode {
+  display: grid;
+  grid-gap: 0;
+  height: 100vh;
+  grid-template-rows: 50% 50%;
+  grid-template-columns: 50% 50%;
+}
+
+.TestMode > div {
+  padding: 4px 10px;
+  overflow: scroll;;
+}
+
+.AppState pre {
+  background-color: lightgray;
+  padding: 4px;
+}
+
+.TestActions {
+  background-color: #ddd;
+}
+
+.WebSocketsLog {
+  background-color: #eee;
+}

@@ -1,0 +1,18 @@
+.TestOperation {
+  border: 1px solid black;
+  margin: 4px 0;
+  padding: 4px;
+}
+
+.TestOperation--result {
+  border: 1px solid black;
+  margin: 4px 0;
+  padding: 4px;
+}
+.TestOperation--result pre {
+  background-color: lightgray;
+  padding: 4px;
+}
+.TestOperation--result--header {
+  display: flex;
+}
