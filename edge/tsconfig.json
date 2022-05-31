@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./build/",
+    "target": "es2018",
+    "lib": [ "es2018" ],
+    "skipLibCheck": true,
+    "moduleResolution": "node16"
+  },
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+  ],
+  "references": [
+    { "path": "../data", }
+  ]
+}

@@ -1,0 +1,19 @@
+# This file describes a Fastly Compute@Edge package. To learn more visit:
+# https://developer.fastly.com/reference/fastly-toml/
+
+authors = ["komuro@fastly.com"]
+description = "An empty application template for the Fastly Compute@Edge environment which simply returns a 200 OK response."
+language = "javascript"
+manifest_version = 2
+name = "edge"
+service_id = ""
+
+[local_server]
+
+  [local_server.backends]
+
+    [local_server.backends.grip-publisher]
+      url = "http://localhost:5561/"
+
+    [local_server.backends.backend-persistence]
+      url = "http://localhost:3001/"
