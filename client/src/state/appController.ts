@@ -2,7 +2,7 @@ import { ActionOrFunctionDispatcher } from "../util/reducerWithThunk";
 import { AppState, AppStateAction, FieldError } from "./state";
 import { WebSocketContextValue } from "../websocket/components/WebSocketProviders";
 import { instance } from "../services/ApiServer";
-import { generateId, RoomInfo, UserInfo } from "../../../data/src";
+import { FullRoomInfo, generateId, } from "../../../data/src";
 
 export class AppController {
   constructor(
@@ -56,6 +56,14 @@ export class AppController {
           }
           return;
         }
+        let roomInfoFull: FullRoomInfo;
+        try {
+          roomInfoFull = await instance.getFullRoomInfo(roomId);
+        } catch {
+          // TODO: If room doesn't exist, we have to create a room
+          return;
+        }
+
         this.dispatch({
           type: 'MODE_SWITCH_TO',
           mode: 'room',
@@ -91,84 +99,41 @@ export class AppController {
         });
 
         const actions: AppStateAction[] = [];
-        const unknownUsernames = new Set<string>();
 
-        const knownUsers = getState().knownUsers;
-        const knownUsernames = new Set<string>(Object.keys(knownUsers));
+        actions.push({
+          type: 'KNOWNROOM_SET_INFO',
+          roomId: roomInfoFull.roomInfo.id,
+          displayName: roomInfoFull.roomInfo.displayName,
+          themeColor: roomInfoFull.roomInfo.themeColor,
+        })
 
-        if(!knownUsernames.has(userId)) {
-          // If we don't know about the current user, we add them too
-          unknownUsernames.add(userId);
+        for(const question of roomInfoFull.questions) {
+          actions.push({
+            type: 'QUESTION_SET_INFO',
+            questionId: question.id,
+            questionText: question.questionText,
+            questionTimestamp: question.questionTimestamp,
+            author: question.author,
+            answerText: question.answerText,
+            answerTimestamp: question.answerTimestamp,
+            answerAuthor: question.answerAuthor,
+            upVotes: question.upVotes,
+          });
         }
 
-        const roomInfoPromise = (async() => {
-          let roomInfo: RoomInfo;
-          try {
-            roomInfo = await instance.getRoomInfo(roomId);
-          } catch {
-            roomInfo = {
-              id: roomId,
-              displayName: roomId,
-              themeColor: '#038cfc',
-            }
-          }
+        for(const userInfo of roomInfoFull.userInfos) {
           actions.push({
-            type: 'KNOWNROOM_SET_INFO',
-            roomId: roomId,
-            displayName: roomInfo.displayName,
-            themeColor: roomInfo.themeColor,
+            type: 'KNOWNUSER_SET_INFO',
+            userId: userInfo.id,
+            displayName: userInfo.displayName,
           });
-        })();
-
-        const questionsPromise = (async() => {
-          const questions = await instance.getQuestionsForRoom(roomId);
-          for(const question of questions) {
-            actions.push({
-              type: 'QUESTION_SET_INFO',
-              questionId: question.id,
-              questionText: question.questionText,
-              questionTimestamp: question.questionTimestamp,
-              author: question.author,
-              answerText: question.answerText,
-              answerTimestamp: question.answerTimestamp,
-              answerAuthor: question.answerAuthor,
-              upVotes: question.upVotes,
-            });
-            if(question.author != null && !knownUsernames.has(question.author)) {
-              unknownUsernames.add(question.author);
-            }
-            if(question.answerAuthor != null && !knownUsernames.has(question.answerAuthor)) {
-              unknownUsernames.add(question.answerAuthor);
-            }
-          }
-          const namesPromises: Promise<void>[] = [];
-          for(const username of [...unknownUsernames]) {
-            const namePromise = (async() => {
-              let userInfo: UserInfo;
-              try {
-                userInfo = await instance.getUserInfo(username);
-              } catch {
-                userInfo = {
-                  id: username,
-                  displayName: username,
-                };
-              }
-              actions.push({
-                type: 'KNOWNUSER_SET_INFO',
-                userId: username,
-                displayName: userInfo.displayName,
-              });
-            })();
-            namesPromises.push(namePromise);
-          }
-          await Promise.all(namesPromises);
-        })();
-
-        await Promise.all([connectPromise, roomInfoPromise, questionsPromise]);
+        }
 
         for (const action of actions) {
           this.dispatch(action);
         }
+
+        await connectPromise;
 
       } finally {
         this.dispatch({
