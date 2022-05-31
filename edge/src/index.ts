@@ -202,6 +202,44 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
 
       break;
     }
+    case 'QUESTION_POST_ANSWER': {
+      const { roomId, questionId, answerAuthor, answerText } = messageContent;
+      console.log('Answer Question', messageContent);
+
+      // Save to backing store
+      const questionInfo = await instance.updateQuestion(roomId, questionId, {
+        answerAuthor,
+        answerText,
+        answerTimestamp: new Date(),
+      });
+
+      let userInfo: UserInfo = null;
+      try {
+        userInfo = await instance.getUserInfo(answerAuthor);
+      } catch{
+        userInfo = null;
+      }
+
+      // Send the whole question as passive update to give it to everyone listening
+      // on that room.
+      const message = {
+        type: 'QUESTION_UPDATE_INFO_PASSIVE',
+        roomId,
+        questionId,
+        answerAuthor,
+        answerText,
+        answerTimestamp: questionInfo.answerTimestamp,
+        userInfo,
+      };
+      console.log('Broadcasting', message);
+      messagesToPublish.push({
+        channel: 'room-' + roomId,
+        messageFormat: new WebSocketMessageFormat(JSON.stringify(message)),
+      });
+
+      break;
+    }
+
     case 'QUESTION_DELETE': {
       const { roomId, questionId } = messageContent;
       console.log('Delete Question', messageContent);

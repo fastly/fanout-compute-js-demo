@@ -71,8 +71,10 @@ export function TestActions() {
       <div>
         <TestOperation label="Answer Question (host)"
                        params={[
+                         {paramName: 'questionId',},
                          {paramName: 'answerText',},
                        ]}
+                       exec={async (params) => await actions.answerQuestion(params.questionId, params.answerText)}
         />
       </div>
 

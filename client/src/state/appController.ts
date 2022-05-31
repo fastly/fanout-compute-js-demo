@@ -230,6 +230,45 @@ export class AppController {
       this.wsContext.send(JSON.stringify(payload));
     });
   }
+  async answerQuestion(questionId: string, answerText: string) {
+    if(!this.isWebsocketConnected()) {
+      return;
+    }
+    this.dispatch(async (dispatch, getState) => {
+
+      const state = getState();
+      const userId = state.currentUserId;
+      const roomId = state.currentRoomId;
+      const stateFlags = state.stateFlags;
+
+      if (userId == null ||
+        roomId == null ||
+        stateFlags.joiningRoom ||
+        stateFlags.leavingRoom
+      ) {
+        return;
+      }
+
+      this.dispatch({
+        type: 'QUESTION_UPDATE_INFO',
+        roomId,
+        questionId,
+        answerAuthor: userId,
+        answerText,
+        answerTimestamp: new Date(),
+      })
+
+      const payload = {
+        type: 'QUESTION_POST_ANSWER',
+        roomId,
+        questionId,
+        answerAuthor: userId,
+        answerText,
+      };
+
+      this.wsContext.send(JSON.stringify(payload));
+    });
+  }
   async deleteQuestion(questionId: string) {
     if(!this.isWebsocketConnected()) {
       // make sure we only delete questions when
