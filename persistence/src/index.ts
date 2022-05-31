@@ -61,6 +61,11 @@ app.post('/api/rooms/', asyncHandler(async (req, res) => {
   res.send(JSON.stringify(await instance.createRoom(req.body.roomId)));
   res.end();
 }));
+app.get('/api/room/:roomId/full', asyncHandler(async (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(await instance.getFullRoomInfo(req.params.roomId)));
+  res.end();
+}));
 
 app.get('/api/room/:roomId/questions', asyncHandler(async (req, res) => {
   res.setHeader('Content-Type', 'application/json');

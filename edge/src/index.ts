@@ -56,6 +56,9 @@ router.get('/api/rooms/', async (req, res) => {
 router.get('/api/room/:roomId', async (req, res) => {
   await processAndSendJsonResult(res, async () => await instance.getRoomInfo(req.params.roomId));
 });
+router.get('/api/room/:roomId/full', async (req, res) => {
+  await processAndSendJsonResult(res, async () => await instance.getFullRoomInfo(req.params.roomId));
+});
 router.get('/api/room/:roomId/questions', async (req, res) => {
   await processAndSendJsonResult(res, async () => await instance.getQuestionsForRoom(req.params.roomId));
 });

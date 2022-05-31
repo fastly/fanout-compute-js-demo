@@ -1,5 +1,5 @@
 
-import { ConnectionCount, QuestionInfo, RoomInfo, Server, UserInfo } from "../../../data/src";
+import { ConnectionCount, FullRoomInfo, QuestionInfo, RoomInfo, Server, UserInfo } from "../../../data/src";
 
 export class ApiServer implements Server {
   constructor(protected baseUrl: string) {}
@@ -33,6 +33,9 @@ export class ApiServer implements Server {
   }
   async getQuestionsForRoom(roomId: string): Promise<QuestionInfo[]> {
     return this.callApi('GET', `/api/room/${roomId}/questions`);
+  }
+  async getFullRoomInfo(roomId: string): Promise<FullRoomInfo> {
+    return this.callApi('GET', `/api/room/${roomId}/full`);
   }
 }
 

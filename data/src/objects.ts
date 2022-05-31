@@ -35,5 +35,12 @@ export interface QuestionInfo extends QuestionData {
   id: string; // ID is random 16 length hex (8 bytes of entropy)
 }
 
+// All the info you can ever want about a room
+export interface FullRoomInfo {
+  roomInfo: RoomInfo;
+  questions: QuestionInfo[];
+  userInfos: UserInfo[];
+}
+
 // Upvotes stored:
 // key = q_

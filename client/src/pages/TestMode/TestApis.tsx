@@ -56,6 +56,13 @@ export function TestApis() {
                        exec={async (params) => await instance.getQuestionsForRoom(params.roomId)}
         />
 
+        <TestOperation label="getFullRoomInfo"
+                       params={[
+                         {paramName: 'roomId',},
+                       ]}
+                       exec={async (params) => await instance.getFullRoomInfo(params.roomId)}
+        />
+
         {instance instanceof PersistenceApiServer ? (
           <TestOperation label="addQuestionToRoom"
                          params={[
