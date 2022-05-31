@@ -37,6 +37,9 @@ export class ApiServer implements Server {
   async getFullRoomInfo(roomId: string): Promise<FullRoomInfo> {
     return this.callApi('GET', `/api/room/${roomId}/full`);
   }
+  async createRoom(roomId: string): Promise<RoomInfo> {
+    return this.callApi('POST', `/api/rooms`, {roomId});
+  }
 }
 
 export const instance = new ApiServer('http://localhost:7999');

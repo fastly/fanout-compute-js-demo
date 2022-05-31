@@ -54,6 +54,10 @@ router.get('/api/channel/:channel/subscriptions', async (req, res) => {
 router.get('/api/rooms/', async (req, res) => {
   await processAndSendJsonResult(res, async () => await instance.getKnownRooms());
 });
+router.post('/api/rooms/', async (req, res) => {
+  const body = JSON.parse(await req.text());
+  await processAndSendJsonResult(res, async () => await instance.createRoom(body.roomId));
+});
 router.get('/api/room/:roomId', async (req, res) => {
   await processAndSendJsonResult(res, async () => await instance.getRoomInfo(req.params.roomId));
 });
@@ -76,10 +80,6 @@ router.put('/api/channel/:channel/subscription/:cid', async (req, res) => {
 });
 router.delete('/api/channel/:channel/subscription/:cid', async (req, res) => {
   await processAndSendJsonResult(res, async () => await instance.removeSub(req.params.channel, req.params.cid));
-});
-router.post('/api/rooms/', async (req, res) => {
-  const body = JSON.parse(await req.text());
-  await processAndSendJsonResult(res, async () => await instance.createRoom(body.roomId));
 });
 router.post('/api/room/:roomId/questions', async(req, res) => {
   const body = JSON.parse(await req.text());

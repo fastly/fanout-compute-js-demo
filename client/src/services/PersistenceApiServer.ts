@@ -10,9 +10,6 @@ export class PersistenceApiServer extends ApiServer
   async removeSub(channel: string, cid: string): Promise<ConnectionCount> {
     return this.callApi('DELETE', `/api/channel/${channel}/subscription/${cid}`);
   }
-  async createRoom(roomId: string): Promise<RoomInfo> {
-    return this.callApi('POST', `/api/rooms`, {roomId});
-  }
   async addQuestionToRoom(roomId: string, userId: string, questionId: string, questionText: string): Promise<QuestionInfo> {
     return this.callApi('POST', `/api/room/${roomId}/questions`, {userId, questionId, questionText});
   }
