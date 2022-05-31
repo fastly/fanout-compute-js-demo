@@ -110,6 +110,14 @@ app.delete('/api/room/:roomId/question/:questionId', asyncHandler(async(req, res
 
 }));
 
+app.post('/api/room/:roomId/question/:questionId/update', asyncHandler(async(req, res) => {
+
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(await instance.updateQuestion(req.params.roomId, req.params.questionId, req.body)));
+  res.end();
+
+}));
+
 app.post('/api/room/:roomId/question/:questionId/up-vote', asyncHandler(async(req, res) => {
 
   const messages = [];

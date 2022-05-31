@@ -85,6 +85,10 @@ router.post('/api/room/:roomId/questions', async(req, res) => {
   const body = JSON.parse(await req.text());
   await processAndSendJsonResult(res, async () => await instance.addQuestionToRoom(req.params.userId, body.roomId, body.questionId, body.questionText));
 });
+router.post('/api/room/:roomId/question/:questionId/update', async(req, res) => {
+  const body = JSON.parse(await req.text());
+  await processAndSendJsonResult(res, async () => await instance.updateQuestion(req.params.roomId, req.params.questionId, body));
+});
 router.post('/api/room/:roomId/question/:questionId/up-vote', async(req, res) => {
   const body = JSON.parse(await req.text());
   await processAndSendJsonResult(res, async () => await instance.upVoteQuestion(req.params.roomId, body.userId, req.params.questionId, body.removeUpvote));

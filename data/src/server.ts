@@ -1,4 +1,4 @@
-import { ConnectionCount, FullRoomInfo, QuestionInfo, RoomInfo, UserInfo } from "./objects";
+import { ConnectionCount, FullRoomInfo, QuestionData, QuestionInfo, RoomInfo, UserInfo } from "./objects";
 
 export interface Server {
   getSubs(channel: string): Promise<ConnectionCount>;
@@ -15,6 +15,7 @@ export interface PersistenceServer extends Server {
   removeSub(channel: string, cid: string): Promise<ConnectionCount>;
   createRoom(roomId: string): Promise<RoomInfo>;
   addQuestionToRoom(roomId: string, userId: string, questionId: string, questionText: string): Promise<QuestionInfo>;
+  updateQuestion(roomId: string, questionId: string, questionData: Partial<QuestionData>): Promise<QuestionInfo>;
   deleteQuestion(roomId: string, userId: string, questionId: string): Promise<void>;
   upVoteQuestion(roomId: string, userId: string, questionId: string, removeUpvote: boolean): Promise<QuestionInfo>;
 }

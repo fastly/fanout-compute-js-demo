@@ -1,4 +1,4 @@
-import { ConnectionCount, FullRoomInfo, PersistenceServer, QuestionInfo, RoomInfo, UserInfo } from "../../../data/src";
+import { ConnectionCount, FullRoomInfo, PersistenceServer, QuestionData, QuestionInfo, RoomInfo, UserInfo } from "../../../data/src";
 
 export class NotFoundError extends Error {}
 export class AlreadyExistsError extends Error {}
@@ -115,6 +115,10 @@ export class Persistence implements PersistenceServer {
 
   async addQuestionToRoom(roomId: string, userId: string, questionId: string, questionText: string): Promise<QuestionInfo> {
     return this.callApi('POST', `/api/room/${roomId}/questions`, {userId, questionId, questionText});
+  }
+
+  async updateQuestion(roomId: string, questionId: string, questionData: Partial<QuestionData>): Promise<QuestionInfo> {
+    return this.callApi('POST', `/api/room/${roomId}/question/${questionId}/update`, questionData);
   }
 
   async deleteQuestion(roomId: string, questionId: string): Promise<void> {

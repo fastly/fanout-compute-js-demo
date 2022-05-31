@@ -1,4 +1,4 @@
-import { ConnectionCount, QuestionInfo, RoomInfo, UserInfo, PersistenceServer, FullRoomInfo } from "../../data/src";
+import { ConnectionCount, QuestionInfo, RoomInfo, UserInfo, PersistenceServer, FullRoomInfo, QuestionData } from "../../data/src";
 
 export class NotFoundError extends Error {}
 export class AlreadyExistsError extends Error {}
@@ -197,6 +197,38 @@ class PersistenceApiServer implements PersistenceServer {
 
     return questionInfo;
 
+  }
+
+  async updateQuestion(roomId: string, questionId: string, questionData: Partial<QuestionData>): Promise<QuestionInfo> {
+    if(!(roomId in this._knownRooms)) {
+      throw new NotFoundError('Unknown room');
+    }
+
+    let upsertItem: QuestionInfo = null;
+    if(roomId in this._questions) {
+      upsertItem = this._questions[roomId].find(x => x.id === questionId);
+    }
+
+    if(upsertItem == null) {
+      throw new NotFoundError('Unknown question');
+    }
+
+    const keys: (keyof QuestionData)[] = [
+      'questionText',
+      'questionTimestamp',
+      'author',
+      'answerText',
+      'answerTimestamp',
+      'answerAuthor',
+      'upVotes',
+    ];
+    for(const key of keys) {
+      if(questionData[key] !== undefined) {
+        (upsertItem as any)[key] = questionData[key];
+      }
+    }
+
+    return upsertItem;
   }
 
   async deleteQuestion(roomId: string, questionId: string): Promise<void> {
