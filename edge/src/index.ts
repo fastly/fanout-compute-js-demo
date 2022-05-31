@@ -48,13 +48,18 @@ async function processAndSendJsonResult(res: EResponse, fn: () => {} | Promise<{
 
 }
 
+router.options('*', async (req, res) => {
+  res.withStatus(200);
+  res.send('OK');
+});
+
 router.get('/api/channel/:channel/subscriptions', async (req, res) => {
   await processAndSendJsonResult(res, async () => await instance.getSubs(req.params.channel));
 });
-router.get('/api/rooms/', async (req, res) => {
+router.get('/api/rooms', async (req, res) => {
   await processAndSendJsonResult(res, async () => await instance.getKnownRooms());
 });
-router.post('/api/rooms/', async (req, res) => {
+router.post('/api/rooms', async (req, res) => {
   const body = JSON.parse(await req.text());
   await processAndSendJsonResult(res, async () => await instance.createRoom(body.roomId));
 });
