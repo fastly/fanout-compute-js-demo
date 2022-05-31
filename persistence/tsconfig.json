@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node16",
+    "module": "commonjs",
+    "target": "es2018",
+    "rootDir": "./src",
+    "outDir": "./build/",
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ],
+  "references": [
+    { "path": "../data", }
+  ]
+}
