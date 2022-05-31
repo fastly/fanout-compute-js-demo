@@ -35,6 +35,7 @@ const initialState: AppState = {
 
 export interface FieldError {
   fieldName: string;
+  errorCode: string;
   errorDescription: string;
 }
 

@@ -41,12 +41,14 @@ export class AppController {
         if(!idValidateRegex.test(userId)) {
           errors.push({
             fieldName: 'userId',
+            errorCode: 'FORMAT',
             errorDescription: 'User ID must be 4-16 alphanumeric + underscore, must start with alphabet, must not end with underscore',
           });
         }
         if(!idValidateRegex.test(roomId)) {
           errors.push({
             fieldName: 'userId',
+            errorCode: 'FORMAT',
             errorDescription: 'User ID must be 4-16 alphanumeric + underscore, must start with alphabet, must not end with underscore',
           });
         }
