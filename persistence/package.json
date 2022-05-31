@@ -15,7 +15,7 @@
     "typescript": "^4.7.2"
   },
   "scripts": {
-    "dev": "tsc && ts-node ./src/index.ts",
+    "dev": "tsc --build && ts-node ./src/index.ts",
     "build": "tsc"
   }
 }
