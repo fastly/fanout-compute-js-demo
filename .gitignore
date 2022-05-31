@@ -1,0 +1,10 @@
+build/
+dist/
+node_modules/
+
+.idea/
+*.iml
+
+*.tsbuildinfo
+
+yarn-error.log
