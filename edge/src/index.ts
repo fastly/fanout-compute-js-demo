@@ -2,7 +2,7 @@
 
 import './console';
 
-import { FPResponse, Router } from "@fastly/expressly";
+import { EResponse, Router } from "@fastly/expressly";
 import { GripExpresslyRequest, GripExpresslyResponse, ServeGrip } from "@fastly/serve-grip-expressly";
 import { createWebSocketControlMessage, WebSocketMessageFormat } from "@fanoutio/grip";
 import { AlreadyExistsError, HttpError, NotFoundError, Persistence } from "./services/Persistence";
@@ -18,7 +18,7 @@ const router = new Router();
 router.use(serveGrip as any);
 
 const instance = new Persistence();
-async function processAndSendJsonResult(res: FPResponse, fn: () => {} | Promise<{}>) {
+async function processAndSendJsonResult(res: EResponse, fn: () => {} | Promise<{}>) {
 
   let result = {};
   try {
