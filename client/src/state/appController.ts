@@ -2,7 +2,7 @@ import { ActionOrFunctionDispatcher } from "../util/reducerWithThunk";
 import { AppState, AppStateAction, FieldError } from "./state";
 import { WebSocketContextValue } from "../websocket/components/WebSocketProviders";
 import { instance } from "../services/ApiServer";
-import { FullRoomInfo, generateId, } from "../../../data/src";
+import { FullRoomInfo, generateId, UserInfo, } from "../../../data/src";
 
 export class AppController {
   constructor(
@@ -23,7 +23,13 @@ export class AppController {
       type: 'TEST_MODE',
     });
   }
+  async startNewRoom(userId: string, roomId: string, errorFn?: (fields: FieldError[]) => void) {
+    return this.createOrEnterRoom(userId, roomId, true, true, errorFn);
+  }
   async enterRoom(userId: string, roomId: string, asHost: boolean, errorFn?: (fields: FieldError[]) => void) {
+    return this.createOrEnterRoom(userId, roomId, false, asHost, errorFn);
+  }
+  async createOrEnterRoom(userId: string, roomId: string, createRoom: boolean, asHost: boolean, errorFn?: (fields: FieldError[]) => void) {
     this.dispatch(async (dispatch, getState) => {
       if(getState().stateFlags.joiningRoom || getState().stateFlags.leavingRoom) {
         return;
@@ -61,9 +67,47 @@ export class AppController {
         let roomInfoFull: FullRoomInfo;
         try {
           roomInfoFull = await instance.getFullRoomInfo(roomId);
+          if(createRoom) {
+            // if room already exists, we say so.
+            // If room doesn't exist, we have to create a room
+            errors.push({
+              fieldName: 'roomId',
+              errorCode: 'EXISTS',
+              errorDescription: 'Room already exists.',
+            });
+            if(errorFn != null) {
+              errorFn(errors);
+            }
+            return;
+          }
         } catch {
-          // TODO: If room doesn't exist, we have to create a room
-          return;
+          if(createRoom) {
+
+            const roomInfo = await instance.createRoom(roomId);
+            let userInfos: UserInfo[] = [];
+            try {
+              const userInfo = await instance.getUserInfo(userId);
+              userInfos.push(userInfo);
+            } catch {
+            }
+
+            roomInfoFull = {
+              userInfos,
+              questions: [],
+              roomInfo,
+            }
+          } else {
+            // If room doesn't exist, we have to create a room
+            errors.push({
+              fieldName: 'roomId',
+              errorCode: 'NOTEXIST',
+              errorDescription: 'Room does not exist.',
+            });
+            if(errorFn != null) {
+              errorFn(errors);
+            }
+            return;
+          }
         }
 
         this.dispatch({

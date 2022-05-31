@@ -10,6 +10,16 @@ export function TestActions() {
       <h2>Test Actions</h2>
 
       <div>
+        <TestOperation label="Create Room"
+                       params={[
+                         {paramName: 'userId',},
+                         {paramName: 'roomId',},
+                       ]}
+                       exec={async (params) => await actions.startNewRoom(params.userId, params.roomId)}
+        />
+      </div>
+
+      <div>
         <TestOperation label="Join Room"
                        params={[
                          {paramName: 'userId',},
