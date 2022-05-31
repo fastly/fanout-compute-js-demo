@@ -6,6 +6,7 @@ import { EResponse, Router } from "@fastly/expressly";
 import { GripExpresslyRequest, GripExpresslyResponse, ServeGrip } from "@fastly/serve-grip-expressly";
 import { createWebSocketControlMessage, WebSocketMessageFormat } from "@fanoutio/grip";
 import { AlreadyExistsError, HttpError, NotFoundError, Persistence } from "./services/Persistence";
+import { UserInfo } from "../../data/src";
 
 const serveGrip = new ServeGrip({
   grip: {
@@ -168,18 +169,26 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
       console.log('Post Question', messageContent);
 
       // Save to backing store
-      const persistenceResult = await instance.addQuestionToRoom(roomId, userId, questionId, questionText);
-      
+      const questionInfo = await instance.addQuestionToRoom(roomId, userId, questionId, questionText);
+
+      let userInfo: UserInfo = null;
+      try {
+        userInfo = await instance.getUserInfo(userId);
+      } catch{
+        userInfo = null;
+      }
+
       // Send the whole question as passive update to give it to everyone listening
       // on that room.
       const message = {
         type: 'QUESTION_UPDATE_INFO_PASSIVE',
         roomId,
-        questionId: persistenceResult.id,
-        questionText: persistenceResult.questionText,
-        questionTimestamp: persistenceResult.questionTimestamp,
-        author: persistenceResult.author,
-        upVotes: persistenceResult.upVotes,
+        questionId: questionInfo.id,
+        questionText: questionInfo.questionText,
+        questionTimestamp: questionInfo.questionTimestamp,
+        author: questionInfo.author,
+        upVotes: questionInfo.upVotes,
+        userInfo,
       };
       console.log('Broadcasting', message);
       messagesToPublish.push({
@@ -216,7 +225,16 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
       console.log('Upvote Question', messageContent);
 
       // Save to backing store
-      const persistenceResult = await instance.upVoteQuestion(roomId, userId, questionId, removeUpvote);
+      const questionInfo = await instance.upVoteQuestion(roomId, userId, questionId, removeUpvote);
+
+      let userInfo: UserInfo = null;
+      if(!removeUpvote) {
+        try {
+          userInfo = await instance.getUserInfo(userId);
+        } catch{
+          userInfo = null;
+        }
+      }
 
       // Get updated data and send to everyone in room
       // Publishing to websockets
@@ -224,7 +242,8 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
         type: 'QUESTION_UPVOTE_PASSIVE',
         roomId,
         questionId,
-        upVotes: persistenceResult.upVotes
+        upVotes: questionInfo.upVotes,
+        userInfo,
       };
       console.log('Broadcasting', message);
       messagesToPublish.push({

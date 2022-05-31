@@ -310,6 +310,13 @@ export class AppController {
         data.author,
         data.upVotes
       );
+      if(data.userInfo != null) {
+        this.dispatch({
+          type: 'KNOWNUSER_SET_INFO',
+          userId: data.userInfo.id,
+          displayName: data.userInfo.displayName,
+        });
+      }
       return;
     case 'QUESTION_UPVOTE_PASSIVE':
       this.upVoteQuestionPassive(
@@ -317,7 +324,14 @@ export class AppController {
         data.questionId,
         data.upVotes
       );
-      return;  
+      if(data.userInfo != null) {
+        this.dispatch({
+          type: 'KNOWNUSER_SET_INFO',
+          userId: data.userInfo.id,
+          displayName: data.userInfo.displayName,
+        });
+      }
+      return;
     }
   }
   deleteQuestionPassive(
