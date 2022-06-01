@@ -1,0 +1,90 @@
+.QuestionsPanel {
+  max-width: 720px;
+  height: 100%;
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-rows: 1fr 140px;
+}
+
+.QuestionItem {
+  position: relative;
+
+  border: 1px solid black;
+  margin: 6px 6px;
+  padding: 6px;
+  border-radius: 4px;
+
+  display: flex;
+}
+.QuestionItem .body {
+  flex-grow: 1;
+  font-size: 16px;
+}
+.QuestionItem .question-info {
+  font-size: 14px;
+  font-style: italic;
+  margin-left: 2em;
+}
+.QuestionItem .question-user {
+  font-weight: bold;
+}
+.QuestionItem .answered-text-area {
+  font-size: 14px;
+  margin: 8px 0;
+}
+.QuestionItem .answered-heading {
+  font-weight: bold;
+}
+.QuestionItem .answered-text-section {
+  font-style: italic;
+  padding-left: 2em;
+}
+
+.QuestionItem .margin {
+  flex-grow: 0;
+  width: 65px;
+}
+
+.QuestionItem .margin > .upvote {
+  text-align: right;
+  margin-top: 20px;
+}
+.QuestionItem .margin > .upvote > button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+.QuestionItem .margin > .upvote > button.upvote-button {
+  display: inline-flex;
+  border-radius: 8px;
+  align-items: center;
+  padding: 1px 4px;
+}
+.QuestionItem .margin > .upvote > button.upvote-button > .count {
+  font-size: 12px;
+  padding-right: 4px;
+  text-align: left;
+}
+.QuestionItem .margin > .upvote > button.upvote-button > .thumbs-up-icon {
+  font-size: 12px;
+}
+.QuestionItem.selfUpVoted .margin > .upvote > button.upvote-button {
+  color: white;
+  font-weight: bold;
+}
+
+.QuestionItem > .status {
+  font-size: 10px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 2px 6px;
+}
+
+.QuestionItem.answered .status {
+  color: white;
+  font-weight: bold;
+}
+

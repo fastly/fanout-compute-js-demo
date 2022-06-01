@@ -2,6 +2,7 @@ import './Room.css';
 import { useAppState } from "../../state/components/AppStateProviders";
 import { RoomInfo, UserInfo } from "../../../../data/src";
 import { useAppController } from "../../state/components/AppControllerProvider";
+import { QuestionsPanel } from "../../components/QuestionsPanel";
 
 type TitleBarProps = {
   userId: string;
@@ -61,6 +62,7 @@ function QuestionsArea(props: QuestionsAreaProps) {
     <div className="questions-area"
          style={{background: backgroundString}}
     >
+      <QuestionsPanel />
     </div>
   );
 
