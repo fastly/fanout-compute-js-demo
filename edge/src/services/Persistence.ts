@@ -47,15 +47,17 @@ export class Persistence implements PersistenceServer {
       throw new HttpError(500, 'Fetch error: ' + String(ex));
     }
 
+    let text: string | null = null;
+
     if (res.status === 404) {
-      const text = await res.text();
+      text = text ?? await res.text();
       if (text.startsWith('Not Found')) {
         throw new NotFoundError(text);
       }
     }
 
     if (res.status === 400) {
-      const text = await res.text();
+      text = text ?? await res.text();
       if (text.startsWith('Already exists')) {
         throw new AlreadyExistsError(text);
       }
@@ -66,11 +68,11 @@ export class Persistence implements PersistenceServer {
     }
 
     if (res.status >= 400) {
-      const text = await res.text();
+      text = text ?? await res.text();
       throw new HttpError(res.status, text);
     }
 
-    return await res.json();
+    return text != null ? JSON.parse(text) : await res.json();
   }
 
   async getSubs(channel: string): Promise<ConnectionCount> {
