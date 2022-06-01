@@ -10,6 +10,7 @@ type QuestionItemProps = {
   knownUsers: Record<string, UserInfo>;
   roomInfo: RoomInfo;
   questionInfo: QuestionInfo;
+  isHost: boolean;
 };
 export function QuestionItem(props: QuestionItemProps) {
 
@@ -19,6 +20,7 @@ export function QuestionItem(props: QuestionItemProps) {
   const knownUsers = props.knownUsers;
   const roomInfo = props.roomInfo;
   const questionInfo = props.questionInfo;
+  const isHost = props.isHost;
 
   const authorDisplayName = knownUsers[questionInfo.author]?.displayName ?? questionInfo.author;
   const questionTime = questionInfo.questionTimestamp;
@@ -84,6 +86,28 @@ export function QuestionItem(props: QuestionItemProps) {
                   onClick={() => controller.upVoteQuestion(questionInfo.id, selfUpVoted)}
           ><div className="count">{questionInfo.upVotes.length}</div> <span className="material-icons thumbs-up-icon">thumb_up</span></button>
         </div>
+        {isHost ? (
+          <div className="actions">
+            <div className="reply">
+              <button className="reply"
+                      style={{
+                        border: "1px solid " + roomInfo.themeColor,
+                      }}
+                      title="Reply"
+                      onClick={() => controller.upVoteQuestion(questionInfo.id, selfUpVoted)}
+              ><span className="material-icons thumbs-up-icon">reply</span></button>
+            </div>
+            <div className="delete">
+              <button className="delete"
+                      style={{
+                        border: "1px solid " + roomInfo.themeColor,
+                      }}
+                      title="Delete"
+                      onClick={() => controller.upVoteQuestion(questionInfo.id, selfUpVoted)}
+              ><span className="material-icons thumbs-up-icon">delete</span></button>
+            </div>
+          </div>
+        ) : null}
       </div>
       <div className="status" style={{
         ...answered ? { background: roomInfo.themeColor } : {},
@@ -133,12 +157,14 @@ type QuestionsListProps = {
   knownUsers: Record<string, UserInfo>;
   roomInfo: RoomInfo;
   questions: QuestionInfo[];
+  isHost: boolean;
 };
 export function QuestionsList(props: QuestionsListProps) {
 
   const userId = props.userId;
   const knownUsers = props.knownUsers;
   const roomInfo = props.roomInfo;
+  const isHost = props.isHost;
   const sortedQuestions = props.questions.slice();
   sortedQuestions.sort(questionListSort);
   sortedQuestions.reverse();
@@ -151,6 +177,7 @@ export function QuestionsList(props: QuestionsListProps) {
                       knownUsers={knownUsers}
                       roomInfo={roomInfo}
                       questionInfo={q}
+                      isHost={isHost}
         />
       ))}
     </div>
@@ -200,6 +227,7 @@ export function QuestionsPanel() {
   const state = useAppState();
   const userId = state.currentUserId;
   const roomId = state.currentRoomId;
+  const isHost = state.isHost;
   if(userId == null || roomId == null) {
     return null;
   }
@@ -210,6 +238,7 @@ export function QuestionsPanel() {
                      knownUsers={state.knownUsers}
                      roomInfo={state.knownRooms[roomId]}
                      questions={state.questions}
+                     isHost={isHost}
       />
       <QuestionEntry />
     </div>

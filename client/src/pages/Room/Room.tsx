@@ -8,12 +8,13 @@ type TitleBarProps = {
   userId: string;
   roomInfo: RoomInfo;
   userInfo?: UserInfo;
+  isHost: boolean;
 }
 function TitleBar(props: TitleBarProps) {
 
   const actions = useAppController();
 
-  const { roomInfo, userId, userInfo } = props;
+  const { roomInfo, userId, userInfo, isHost } = props;
 
   return (
     <div className="title-bar"
@@ -35,8 +36,10 @@ function TitleBar(props: TitleBarProps) {
         >
           {roomInfo.displayName}
         </div>
-        <div className="spacer edit-button">
-          <button><span className="material-icons">edit</span></button>
+        <div className={"spacer " + (isHost ? " edit-button" : "")}>
+          {isHost ? (
+            <button><span className="material-icons">edit</span></button>
+          ) : null}
         </div>
       </div>
       <div className="spacer user-name-section">
@@ -82,6 +85,7 @@ export function Room() {
       <TitleBar userId={appState.currentUserId}
                 roomInfo={appState.knownRooms[appState.currentRoomId]}
                 userInfo={appState.knownUsers[appState.currentUserId]}
+                isHost={appState.isHost}
       />
       <QuestionsArea roomInfo={appState.knownRooms[appState.currentRoomId]} />
     </div>

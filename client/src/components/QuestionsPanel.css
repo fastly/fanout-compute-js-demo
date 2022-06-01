@@ -75,6 +75,25 @@
   font-weight: bold;
 }
 
+.QuestionItem .margin > .actions {
+  display: flex;
+  justify-content: end;
+  margin: 4px 0;
+}
+
+.QuestionItem .margin > .actions button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  margin: 0 2px;
+}
+.QuestionItem .margin > .actions button > .material-icons {
+  font-size: 20px;
+}
+
+
 .QuestionItem > .status {
   font-size: 10px;
   position: absolute;
