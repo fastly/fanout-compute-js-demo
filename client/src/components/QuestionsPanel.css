@@ -88,3 +88,28 @@
   font-weight: bold;
 }
 
+.QuestionEntry {
+  display: grid;
+  grid-template-rows: 24px 1fr 32px;
+}
+
+.QuestionEntry > .question-entryarea {
+  padding: 4px 0;
+}
+
+.QuestionEntry > .question-entryarea > .textentry {
+  height: 100%;
+  width: 100%;
+}
+
+.QuestionEntry > .question-buttonarea {
+  text-align: center;
+}
+
+.QuestionEntry > .question-buttonarea > .question-submit {
+  font-size: 16px;
+  border-radius: 16px;
+  background: white;
+  border: 1px solid white;
+  cursor: pointer;
+}

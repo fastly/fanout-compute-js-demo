@@ -1,3 +1,4 @@
+import { useState } from "react";
 import './QuestionsPanel.css';
 import { useAppState } from "../state/components/AppStateProviders";
 import { QuestionInfo, RoomInfo, UserInfo } from "../../../data/src";
@@ -157,9 +158,39 @@ export function QuestionsList(props: QuestionsListProps) {
 }
 
 export function QuestionEntry() {
+  const controller = useAppController();
+
+  const [ submitting, setSubmitting ] = useState<boolean>(false);
+  const [ questionTextValue, setQuestionTextValue ] = useState('');
+
   return (
     <div className="QuestionEntry">
-
+      <div className="question-prompt">
+        Add your question!
+      </div>
+      <div className="question-entryarea">
+        <textarea className="textentry"
+                  disabled={submitting}
+                  onChange={e => setQuestionTextValue(e.target.value)}
+                  value={questionTextValue}
+        />
+      </div>
+      <div className="question-buttonarea">
+        <button className="question-submit"
+                disabled={submitting || questionTextValue.length === 0}
+                onClick={async (e) => {
+                  setSubmitting(true);
+                  try {
+                    await controller.postQuestion(questionTextValue);
+                  } finally {
+                    setQuestionTextValue('');
+                    setSubmitting(false);
+                  }
+                }}
+        >
+          Submit your question
+        </button>
+      </div>
     </div>
   );
 }
