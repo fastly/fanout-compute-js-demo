@@ -2,7 +2,7 @@ import { ActionOrFunctionDispatcher } from "../util/reducerWithThunk";
 import { AppState, AppStateAction, FieldError } from "./state";
 import { WebSocketContextValue } from "../websocket/components/WebSocketProviders";
 import { instance } from "../services/ApiServer";
-import { FullRoomInfo, generateId, RoomData, UserData, UserInfo, } from "../../../data/src";
+import { FullRoomInfo, generateId, QuestionInfo, RoomData, RoomInfo, UserData, UserInfo, } from "../../../data/src";
 
 export class AppController {
   constructor(
@@ -458,6 +458,23 @@ export class AppController {
 
       this.wsContext.send(JSON.stringify(payload));
 
+    });
+  }
+  enterQuestionUi(subModeName: string, userId: string, roomInfo: RoomInfo, questionInfo: QuestionInfo) {
+    this.dispatch({
+      type: 'MODE_SUBMODE_SWITCH_TO',
+      subMode: subModeName,
+      params: {
+        userId,
+        roomInfo,
+        questionInfo,
+      },
+    });
+  }
+  leaveQuestionUi() {
+    this.dispatch({
+      type: 'MODE_SUBMODE_SWITCH_TO',
+      subMode: undefined,
     });
   }
   upVoteQuestion(questionId: string, removeUpvote: boolean) {
