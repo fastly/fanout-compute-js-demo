@@ -24,13 +24,13 @@ export class AppController {
       value: enable,
     });
   }
-  async startNewRoom(userId: string, roomId: string, errorFn?: (fields: FieldError[]) => void) {
-    return this.createOrEnterRoom(userId, roomId, true, true, errorFn);
+  async startNewRoom(userId: string, roomId: string, roomDisplayName: string, roomThemeColor: string, errorFn?: (fields: FieldError[]) => void) {
+    await this.createOrEnterRoom(userId, roomId, true, roomDisplayName, roomThemeColor, true, errorFn);
   }
   async enterRoom(userId: string, roomId: string, asHost: boolean, errorFn?: (fields: FieldError[]) => void) {
-    return this.createOrEnterRoom(userId, roomId, false, asHost, errorFn);
+    return this.createOrEnterRoom(userId, roomId, false, undefined, undefined, asHost, errorFn);
   }
-  async createOrEnterRoom(userId: string, roomId: string, createRoom: boolean, asHost: boolean, errorFn?: (fields: FieldError[]) => void) {
+  async createOrEnterRoom(userId: string, roomId: string, createRoom: boolean, roomDisplayName: string | undefined, roomThemeColor: string | undefined, asHost: boolean, errorFn?: (fields: FieldError[]) => void) {
     this.dispatch(async (dispatch, getState) => {
       if(getState().stateFlags.joiningRoom || getState().stateFlags.leavingRoom) {
         return;
@@ -113,7 +113,7 @@ export class AppController {
         } catch {
           if(createRoom) {
 
-            const roomInfo = await instance.createRoom(roomId);
+            const roomInfo = await instance.createRoom(roomId, roomDisplayName, roomThemeColor);
             let userInfos: UserInfo[] = [];
             try {
               const userInfo = await instance.getUserInfo(userId);

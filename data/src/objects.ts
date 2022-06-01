@@ -25,7 +25,7 @@ export interface RoomInfo extends RoomData {
 export function createRoomInfo(roomId: string, data?: Partial<RoomData>): RoomInfo {
   const roomInfo: RoomInfo = {
     id: roomId,
-    displayName: 'New Room:' + roomId,
+    displayName: 'New Room: ' + roomId,
     themeColor: '#038cfc', // default color
   };
   mergeRoomData(roomInfo, data);

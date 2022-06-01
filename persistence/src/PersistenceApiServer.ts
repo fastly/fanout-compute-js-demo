@@ -163,11 +163,11 @@ class PersistenceApiServer implements PersistenceServer {
     return roomInfo;
   }
 
-  async createRoom(roomId: string): Promise<RoomInfo> {
+  async createRoom(roomId: string, displayName?: string, themeColor?: string): Promise<RoomInfo> {
     if(roomId in this._knownRooms) {
       throw new AlreadyExistsError('Room already exists');
     }
-    const roomInfo = createRoomInfo(roomId);
+    const roomInfo = createRoomInfo(roomId, { displayName, themeColor });
     this._knownRooms[roomId] = roomInfo;
     return roomInfo;
   }

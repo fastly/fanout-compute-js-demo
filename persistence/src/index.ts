@@ -63,7 +63,7 @@ app.get('/api/room/:roomId', asyncHandler(async (req, res) => {
 }));
 app.post('/api/rooms/', asyncHandler(async (req, res) => {
   res.setHeader('Content-Type', 'application/json');
-  res.send(JSON.stringify(await instance.createRoom(req.body.roomId)));
+  res.send(JSON.stringify(await instance.createRoom(req.body.roomId, req.body.displayName, req.body.themeColor)));
   res.end();
 }));
 app.get('/api/room/:roomId/full', asyncHandler(async (req, res) => {

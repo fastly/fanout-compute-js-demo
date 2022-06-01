@@ -14,8 +14,10 @@ export function TestActions() {
                        params={[
                          {paramName: 'userId',},
                          {paramName: 'roomId',},
+                         {paramName: 'displayName',},
+                         {paramName: 'themeColor',},
                        ]}
-                       exec={async (params) => await actions.startNewRoom(params.userId, params.roomId)}
+                       exec={async (params) => await actions.startNewRoom(params.userId, params.roomId, params.displayName, params.themeColor)}
         />
       </div>
 

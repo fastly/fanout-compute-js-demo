@@ -3,7 +3,7 @@ import { ConnectionCount, FullRoomInfo, QuestionData, QuestionInfo, RoomData, Ro
 export interface Server {
   getSubs(channel: string): Promise<ConnectionCount>;
   getKnownRooms(): Promise<Record<string, RoomInfo>>;
-  createRoom(roomId: string): Promise<RoomInfo>;
+  createRoom(roomId: string, displayName?: string, themeColor?: string): Promise<RoomInfo>;
   getKnownUsers(): Promise<Record<string, UserInfo>>;
   getRoomInfo(roomId: string): Promise<RoomInfo>;
   getUserInfo(userId: string): Promise<UserInfo>;

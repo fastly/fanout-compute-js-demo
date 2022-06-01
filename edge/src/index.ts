@@ -61,7 +61,7 @@ router.get('/api/rooms', async (req, res) => {
 });
 router.post('/api/rooms', async (req, res) => {
   const body = JSON.parse(await req.text());
-  await processAndSendJsonResult(res, async () => await instance.createRoom(body.roomId));
+  await processAndSendJsonResult(res, async () => await instance.createRoom(body.roomId, body.displayName, body.themeColor));
 });
 router.get('/api/room/:roomId', async (req, res) => {
   await processAndSendJsonResult(res, async () => await instance.getRoomInfo(req.params.roomId));

@@ -119,8 +119,8 @@ export class Persistence implements PersistenceServer {
     return this.callApi('POST', `/api/room/${roomId}/update`, roomData);
   }
 
-  async createRoom(roomId: string): Promise<RoomInfo> {
-    return this.callApi('POST', `/api/rooms`, {roomId});
+  async createRoom(roomId: string, displayName?: string, themeColor?: string): Promise<RoomInfo> {
+    return this.callApi('POST', `/api/rooms`, {roomId, displayName, themeColor});
   }
 
   async addQuestionToRoom(roomId: string, userId: string, questionId: string, questionText: string): Promise<QuestionInfo> {

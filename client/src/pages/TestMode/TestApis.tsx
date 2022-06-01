@@ -44,8 +44,10 @@ export function TestApis() {
           <TestOperation label="createRoom"
                          params={[
                            {paramName: 'roomId',},
+                           {paramName: 'displayName',},
+                           {paramName: 'themeColor',},
                          ]}
-                         exec={async (params) => await instance.createRoom(params.roomId)}
+                         exec={async (params) => await instance.createRoom(params.roomId, params.displayName, params.themeColor)}
           />
         ) : null}
 
