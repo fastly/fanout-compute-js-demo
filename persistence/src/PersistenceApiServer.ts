@@ -21,18 +21,18 @@ export class AlreadyExistsError extends Error {}
 
 class PersistenceApiServer implements PersistenceServer {
   _knownRooms: Record<string, RoomInfo> = {
-    'foo': {
-      id: 'foo',
+    'room-foo': {
+      id: 'room-foo',
       displayName: 'Foo Room',
       themeColor: '#038cfc',
     },
-    'bar': {
-      id: 'bar',
+    'room-bar': {
+      id: 'room-bar',
       displayName: 'Bar Room',
       themeColor: '#f5429b',
     },
-    'baz': {
-      id: 'baz',
+    'room-baz': {
+      id: 'room-baz',
       displayName: 'Baz Room',
       themeColor: '#188c2d',
     },
@@ -50,7 +50,7 @@ class PersistenceApiServer implements PersistenceServer {
   };
 
   _questions: Record<string, QuestionInfo[]> = {
-    'foo': [
+    'room-foo': [
       {
         id: '64fc25ad1f71466a',
         questionText: 'When will be the next event?',
