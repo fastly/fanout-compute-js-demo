@@ -1,0 +1,86 @@
+.Room {
+
+  display: grid;
+  height: 100vh;
+
+  grid-template-rows: 50px 1fr;
+
+}
+
+.Room .title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid black;
+}
+.Room .title-bar > .spacer {
+  margin: 0 4px;
+  width: 120px;
+}
+
+.Room .title-bar button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.Room .title-bar .exit-section > .exit-button {
+  display: inline-flex;
+  align-items: center;
+}
+.Room .title-bar .exit-section > .exit-button > .exit-text {
+  font-size: 14px;
+}
+
+.Room .title-bar .room-name-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.Room .title-bar .room-name-section > .spacer {
+  width: 30px;
+  text-align: center;
+}
+.Room .title-bar .room-name-section > .spacer > button > span {
+  font-size: 16px;
+}
+
+.Room .title-bar .user-name-section {
+  display: flex;
+  justify-content: space-between;
+}
+
+.Room .title-bar .user-name-section > .username {
+  font-size: 14px;
+}
+.Room .title-bar .user-name-section > button > span {
+  font-size: 18px;
+}
+
+@media only screen and (min-width: 767px) {
+  .Room .title-bar > .spacer {
+    width: 160px;
+  }
+  .Room .title-bar .exit-section > .exit-button > .exit-text {
+    font-size: 18px;
+  }
+  .Room .title-bar .room-name-section {
+    font-size: 30px;
+  }
+  .Room .title-bar .room-name-section > .spacer {
+    width: 50px;
+  }
+  .Room .title-bar .room-name-section > .spacer > button > span {
+    font-size: 24px;
+  }
+  .Room .title-bar .user-name-section > .username {
+    font-size: 22px;
+  }
+  .Room .title-bar .user-name-section > button > span {
+    font-size: 24px;
+  }
+}
+

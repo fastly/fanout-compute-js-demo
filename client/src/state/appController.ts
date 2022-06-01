@@ -204,6 +204,10 @@ export class AppController {
       try {
         this.closeWs();
         this.dispatch({
+          type: 'MODE_SWITCH_TO',
+          mode: 'start',
+        });
+        this.dispatch({
           type: 'USER_SET_ID',
           value: null,
         });
