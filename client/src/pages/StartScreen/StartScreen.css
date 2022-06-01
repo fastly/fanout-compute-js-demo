@@ -1,0 +1,69 @@
+.StartScreen {
+
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.StartScreen > .main-area {
+
+  width: 80%;
+  height: 80%;
+
+}
+
+.StartScreen > .main-area > .title {
+
+  font-size: 48px;
+  color: darkblue;
+  text-align: center;
+  margin: 16px 0;
+
+}
+
+.StartScreen > .main-area > .start-form {
+  margin: 32px auto;
+  font-size: 24px;
+
+  width: 50%;
+}
+.StartScreen > .main-area > .start-form .start-message,
+.StartScreen > .main-area > .start-form .submit-button-group {
+  text-align: center;
+}
+
+.StartScreen > .main-area > .start-form .input-group {
+  margin: 32px 0;
+}
+
+.StartScreen > .main-area > .start-form .label-text {
+  font-size: 18px;
+}
+
+.StartScreen > .main-area > .start-form .input-text-field {
+  font-size: 18px;
+  width: 100%;
+  padding: 8px;
+}
+
+.StartScreen > .main-area > .start-form .input-text-field,
+.StartScreen > .main-area > .start-form .input-checkbox-field {
+  cursor: pointer;
+}
+
+.StartScreen > .main-area > .start-form .submit-button-group button {
+  font-size: 24px;
+  border: 1px solid black;
+  border-radius: 10px;
+  background: darkblue;
+  color: white;
+  padding: 4px 16px;
+  cursor: pointer;
+}
+
+.StartScreen > .main-area > .start-form .error-group {
+  font-size: 16px;
+  color: red;
+}
