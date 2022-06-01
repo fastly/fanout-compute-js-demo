@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import './QuestionsPanel.css';
 import { useAppState } from "../state/components/AppStateProviders";
 import { QuestionInfo, RoomInfo, UserInfo } from "../../../data/src";
 import { useAppController } from "../state/components/AppControllerProvider";
 import TimeAgo from 'react-timeago';
+import { DeleteQuestion } from "./DeleteQuestion";
 
 type QuestionItemProps = {
   userId: string;
@@ -103,7 +104,7 @@ export function QuestionItem(props: QuestionItemProps) {
                         border: "1px solid " + roomInfo.themeColor,
                       }}
                       title="Delete"
-                      onClick={() => controller.upVoteQuestion(questionInfo.id, selfUpVoted)}
+                      onClick={() => controller.enterQuestionUi('delete', userId, roomInfo, questionInfo)}
               ><span className="material-icons thumbs-up-icon">delete</span></button>
             </div>
           </div>
@@ -232,6 +233,13 @@ export function QuestionsPanel() {
     return null;
   }
 
+  let subComponent: ReactNode | null = null;
+  if (state.subMode === 'delete') {
+    subComponent = (
+      <DeleteQuestion />
+    );
+  }
+
   return (
     <div className="QuestionsPanel">
       <QuestionsList userId={userId}
@@ -241,6 +249,7 @@ export function QuestionsPanel() {
                      isHost={isHost}
       />
       <QuestionEntry />
+      {subComponent}
     </div>
   );
 }
