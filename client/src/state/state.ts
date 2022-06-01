@@ -21,6 +21,9 @@ export interface AppStateFlags {
 
 export interface AppState {
   mode: string;
+  modeParams?: Record<string, any>;
+  subMode?: string;
+  subModeParams?: Record<string, any>;
   test_mode: boolean;
   test_mode_button: boolean;
   stateFlags: AppStateFlags;
@@ -34,6 +37,9 @@ export interface AppState {
 
 const initialState: AppState = {
   mode: 'start',
+  modeParams: undefined,
+  subMode: undefined,
+  subModeParams: undefined,
   test_mode: false,
   test_mode_button: true,
   stateFlags: {
@@ -62,6 +68,12 @@ interface ActionTestMode {
 interface ActionModeSwitchTo {
   type: 'MODE_SWITCH_TO';
   mode: string;
+  params?: Record<string, any>;
+}
+interface ActionSubModeSwitchTo {
+  type: 'MODE_SUBMODE_SWITCH_TO';
+  subMode?: string;
+  params?: Record<string, any>;
 }
 
 interface ActionSetJoiningRoom {
@@ -133,6 +145,7 @@ interface ActionQuestionUpvote {
 export type AppStateAction =
   ActionTestMode |
   ActionModeSwitchTo |
+  ActionSubModeSwitchTo |
   ActionSetJoiningRoom |
   ActionSetUserId |
   ActionSetIsHost |
@@ -158,6 +171,15 @@ function reducer(state: AppState, action: AppStateAction): AppState {
       return {
         ...state,
         mode: action.mode,
+        modeParams: action.params,
+        subMode: undefined,
+        subModeParams: undefined,
+      };
+    case 'MODE_SUBMODE_SWITCH_TO':
+      return {
+        ...state,
+        subMode: action.subMode,
+        subModeParams: action.params,
       };
     case 'APPSTATE_SET_FLAG':
       return {
