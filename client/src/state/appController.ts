@@ -44,21 +44,50 @@ export class AppController {
         const errors: FieldError[] = [];
         // make sure user ID and room ID are valid.
         // 4-16 alphanumeric + underscore, must start with alphabet, must not end with underscore
-        const idValidateRegex = /^[A-Za-z]\w{2,14}[A-Za-z\d]$/;
-        if(!idValidateRegex.test(userId)) {
-          errors.push({
-            fieldName: 'userId',
-            errorCode: 'FORMAT',
-            errorDescription: 'User ID must be 4-16 alphanumeric + underscore, must start with alphabet, must not end with underscore',
-          });
+
+        const validRegex = /^[a-z][-_.a-z\d]{2,14}[a-z\d]$/;
+        const validChars = /^[-_.a-z\d]*$/;
+        const validStart = /^[a-z]/;
+        const validEnd = /[a-z\d]$/;
+
+        function validate(id: string, label: string) {
+          if(validRegex.test(id)) {
+            return;
+          }
+
+          if(id.length < 4 || id.length > 16) {
+            errors.push({
+              fieldName: 'userId',
+              errorCode: 'FORMAT',
+              errorDescription: `${label} must be 4-16 characters long.`,
+            });
+          }
+          if(!validChars.test(id)) {
+            errors.push({
+              fieldName: 'userId',
+              errorCode: 'FORMAT',
+              errorDescription: `${label} can contain letters, numbers, hyphen, dots, and underscores.`,
+            });
+          }
+          if(!validStart.test(id)) {
+            errors.push({
+              fieldName: 'userId',
+              errorCode: 'FORMAT',
+              errorDescription: `${label} must start with a letter.`,
+            });
+          }
+          if(!validEnd.test(id)) {
+            errors.push({
+              fieldName: 'userId',
+              errorCode: 'FORMAT',
+              errorDescription: `${label} must end with a letter or number.`,
+            });
+          }
         }
-        if(!idValidateRegex.test(roomId)) {
-          errors.push({
-            fieldName: 'userId',
-            errorCode: 'FORMAT',
-            errorDescription: 'Room ID must be 4-16 alphanumeric + underscore, must start with alphabet, must not end with underscore',
-          });
-        }
+
+        validate(userId, 'Username');
+        validate(roomId, 'Room ID');
+
         if(errors.length > 0) {
           if(errorFn != null) {
             errorFn(errors);
