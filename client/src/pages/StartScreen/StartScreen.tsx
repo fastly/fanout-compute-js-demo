@@ -45,7 +45,6 @@ export function StartScreen() {
       </div>
 
       <div>
-        <button onClick={() => appController.testMode()}>Test</button>
         <button onClick={() => appController.enterRoom(userId, roomId, asHost, onError)}>Start</button>
       </div>
     </div>

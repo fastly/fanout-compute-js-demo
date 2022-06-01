@@ -1,0 +1,11 @@
+.TestModeButton {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+.TestModeButton > button {
+  height: 44px;
+  width: 88px;
+  cursor: pointer;
+}

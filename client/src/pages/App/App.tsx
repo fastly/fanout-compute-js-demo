@@ -4,6 +4,7 @@ import { useAppState } from "../../state/components/AppStateProviders";
 import { StartScreen } from '../StartScreen/StartScreen';
 import { Room } from '../Room/Room';
 import { TestMode } from "../TestMode/TestMode";
+import { TestModeButton } from "../TestMode/TestModeButton";
 
 function App() {
 
@@ -27,15 +28,15 @@ function App() {
       );
   }
 
-  if(state.test_mode) {
-    component = (
-      <TestMode />
-    );
-  }
-
   return (
     <div className="App">
       {component}
+      {state.test_mode ? (
+        <TestMode />
+      ) : null}
+      {state.test_mode_button ? (
+        <TestModeButton />
+      ) : null}
     </div>
   );
 }

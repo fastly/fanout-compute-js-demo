@@ -18,9 +18,10 @@ export class AppController {
   closeWs() {
     this.wsContext.close();
   }
-  testMode() {
+  testMode(enable: boolean = true) {
     this.dispatch({
       type: 'TEST_MODE',
+      value: enable,
     });
   }
   async startNewRoom(userId: string, roomId: string, errorFn?: (fields: FieldError[]) => void) {

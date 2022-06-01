@@ -22,6 +22,7 @@ export interface AppStateFlags {
 export interface AppState {
   mode: string;
   test_mode: boolean;
+  test_mode_button: boolean;
   stateFlags: AppStateFlags;
   currentRoomId: string | null;
   currentUserId: string | null;
@@ -34,6 +35,7 @@ export interface AppState {
 const initialState: AppState = {
   mode: 'start',
   test_mode: false,
+  test_mode_button: true,
   stateFlags: {
     joiningRoom: false,
     leavingRoom: false,
@@ -54,6 +56,7 @@ export interface FieldError {
 
 interface ActionTestMode {
   type: 'TEST_MODE';
+  value: boolean;
 }
 
 interface ActionModeSwitchTo {
@@ -149,7 +152,7 @@ function reducer(state: AppState, action: AppStateAction): AppState {
     case 'TEST_MODE':
       return {
         ...state,
-        test_mode: true,
+        test_mode: action.value,
       };
     case 'MODE_SWITCH_TO':
       return {
