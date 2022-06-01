@@ -1,4 +1,4 @@
-import { ConnectionCount, PersistenceServer, QuestionData, QuestionInfo, RoomInfo, } from "../../../data/src";
+import { ConnectionCount, PersistenceServer, QuestionData, QuestionInfo, RoomData, RoomInfo, UserData, UserInfo, } from "../../../data/src";
 import { ApiServer } from "./ApiServer";
 
 export class PersistenceApiServer extends ApiServer
@@ -9,6 +9,12 @@ export class PersistenceApiServer extends ApiServer
   }
   async removeSub(channel: string, cid: string): Promise<ConnectionCount> {
     return this.callApi('DELETE', `/api/channel/${channel}/subscription/${cid}`);
+  }
+  async updateUserInfo(userId: string, userData: Partial<UserData>): Promise<UserInfo> {
+    return this.callApi('POST', `/api/user/${userId}/update`, userData);
+  }
+  async updateRoomInfo(roomId: string, roomData: Partial<RoomData>): Promise<RoomInfo> {
+    return this.callApi('POST', `/api/room/${roomId}/update`, roomData);
   }
   async addQuestionToRoom(roomId: string, userId: string, questionId: string, questionText: string): Promise<QuestionInfo> {
     return this.callApi('POST', `/api/room/${roomId}/questions`, {userId, questionId, questionText});

@@ -2,7 +2,7 @@ import { ActionOrFunctionDispatcher } from "../util/reducerWithThunk";
 import { AppState, AppStateAction, FieldError } from "./state";
 import { WebSocketContextValue } from "../websocket/components/WebSocketProviders";
 import { instance } from "../services/ApiServer";
-import { FullRoomInfo, generateId, UserInfo, } from "../../../data/src";
+import { FullRoomInfo, generateId, RoomData, UserData, UserInfo, } from "../../../data/src";
 
 export class AppController {
   constructor(
@@ -226,6 +226,71 @@ export class AppController {
       }
     });
   }
+  async updateUserInfo(userData: Partial<UserData>) {
+    if(!this.isWebsocketConnected()) {
+      return;
+    }
+    this.dispatch(async (dispatch, getState) => {
+
+      const state = getState();
+      const userId = state.currentUserId;
+      const stateFlags = state.stateFlags;
+
+      if (userId == null ||
+        stateFlags.joiningRoom ||
+        stateFlags.leavingRoom
+      ) {
+        return;
+      }
+
+      this.dispatch({
+        type: 'KNOWNUSER_UPDATE_INFO',
+        userId,
+        displayName: userData.displayName,
+      });
+
+      const payload = {
+        type: 'USERINFO_UPDATE',
+        userId,
+        userData,
+      };
+
+      this.wsContext.send(JSON.stringify(payload));
+    });
+  }
+  async updateRoomInfo(roomData: Partial<RoomData>) {
+    if(!this.isWebsocketConnected()) {
+      return;
+    }
+    this.dispatch(async (dispatch, getState) => {
+
+      const state = getState();
+      const roomId = state.currentRoomId;
+      const stateFlags = state.stateFlags;
+
+      if (roomId == null ||
+        stateFlags.joiningRoom ||
+        stateFlags.leavingRoom
+      ) {
+        return;
+      }
+
+      this.dispatch({
+        type: 'KNOWNROOM_UPDATE_INFO',
+        roomId,
+        displayName: roomData.displayName,
+        themeColor: roomData.themeColor,
+      });
+
+      const payload = {
+        type: 'ROOMINFO_UPDATE',
+        roomId,
+        roomData,
+      };
+
+      this.wsContext.send(JSON.stringify(payload));
+    });
+  }
   switchToMode(mode: string) {
     this.dispatch({
       type: 'MODE_SWITCH_TO',
@@ -380,6 +445,25 @@ export class AppController {
   ) {
     // This is a message from websocket
     switch(data.type) {
+    case 'USERINFO_UPDATE_PASSIVE':
+      if(data.userInfo != null) {
+        this.dispatch({
+          type: 'KNOWNUSER_SET_INFO',
+          userId: data.userInfo.id,
+          displayName: data.userInfo.displayName,
+        });
+      }
+      return;
+    case 'ROOMINFO_UPDATE_PASSIVE':
+      if(data.roomInfo != null) {
+        this.dispatch({
+          type: 'KNOWNROOM_SET_INFO',
+          roomId: data.roomInfo.id,
+          displayName: data.roomInfo.displayName,
+          themeColor: data.roomInfo.themeColor,
+        });
+      }
+      return;
     case 'QUESTION_DELETE_PASSIVE':
       this.deleteQuestionPassive(
         data.roomId,

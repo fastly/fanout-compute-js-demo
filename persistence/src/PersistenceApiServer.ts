@@ -1,4 +1,4 @@
-import { ConnectionCount, QuestionInfo, RoomInfo, UserInfo, PersistenceServer, FullRoomInfo, QuestionData } from "../../data/src";
+import { ConnectionCount, QuestionInfo, RoomInfo, UserInfo, PersistenceServer, FullRoomInfo, QuestionData, UserData, RoomData } from "../../data/src";
 
 export class NotFoundError extends Error {}
 export class AlreadyExistsError extends Error {}
@@ -116,6 +116,21 @@ class PersistenceApiServer implements PersistenceServer {
     throw new NotFoundError('Unknown user');
   }
 
+  async updateUserInfo(userId: string, userData: Partial<UserData>): Promise<UserInfo> {
+    let userInfo: UserInfo = this._knownUsers[userId];
+    if(userInfo == null) {
+      userInfo = {
+        id: userId,
+        displayName: userId,
+      };
+      this._knownUsers[userId] = userInfo;
+    }
+    if(userData.displayName !== undefined) {
+      userInfo.displayName = userData.displayName;
+    }
+    return userInfo;
+  }
+
   async getKnownRooms(): Promise<Record<string, RoomInfo>> {
     return this._knownRooms;
   }
@@ -125,6 +140,25 @@ class PersistenceApiServer implements PersistenceServer {
       return this._knownRooms[roomId];
     }
     throw new NotFoundError('Unknown room');
+  }
+
+  async updateRoomInfo(roomId: string, roomData: Partial<RoomData>): Promise<RoomInfo> {
+    let roomInfo: RoomInfo = this._knownRooms[roomId];
+    if(roomInfo == null) {
+      roomInfo = {
+        id: roomId,
+        displayName: 'New room: ' + roomId,
+        themeColor: '#038cfc', // default color,
+      };
+      this._knownRooms[roomId] = roomInfo;
+    }
+    if(roomData.displayName !== undefined) {
+      roomInfo.displayName = roomData.displayName;
+    }
+    if(roomData.themeColor !== undefined) {
+      roomInfo.themeColor = roomData.themeColor;
+    }
+    return roomInfo;
   }
 
   async createRoom(roomId: string): Promise<RoomInfo> {

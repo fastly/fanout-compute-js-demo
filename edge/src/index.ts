@@ -86,6 +86,14 @@ router.put('/api/channel/:channel/subscription/:cid', async (req, res) => {
 router.delete('/api/channel/:channel/subscription/:cid', async (req, res) => {
   await processAndSendJsonResult(res, async () => await instance.removeSub(req.params.channel, req.params.cid));
 });
+router.post('/api/user/:userId/update', async(req, res) => {
+  const body = JSON.parse(await req.text());
+  await processAndSendJsonResult(res, async () => await instance.updateUserInfo(req.params.userId, body));
+});
+router.post('/api/room/:roomId/update', async(req, res) => {
+  const body = JSON.parse(await req.text());
+  await processAndSendJsonResult(res, async () => await instance.updateRoomInfo(req.params.roomId, body));
+});
 router.post('/api/room/:roomId/questions', async(req, res) => {
   const body = JSON.parse(await req.text());
   await processAndSendJsonResult(res, async () => await instance.addQuestionToRoom(req.params.userId, body.roomId, body.questionId, body.questionText));
@@ -173,6 +181,46 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
     }
 
     switch(messageContent.type) {
+    case 'ROOMINFO_UPDATE': {
+      const { roomId, roomData } = messageContent;
+      console.log('Update Room Info', messageContent);
+
+      // Save to backing store
+      const roomInfo = await instance.updateRoomInfo(roomId, roomData);
+
+      // Broadcast it
+      const message = {
+        type: 'ROOMINFO_UPDATE_PASSIVE',
+        roomInfo,
+      };
+      console.log('Broadcasting', message);
+      messagesToPublish.push({
+        channel: 'room-' + roomId,
+        messageFormat: new WebSocketMessageFormat(JSON.stringify(message)),
+      });
+
+      break;
+    }
+    case 'USERINFO_UPDATE': {
+      const { userId, userData } = messageContent;
+      console.log('Update User Info', messageContent);
+
+      // Save to backing store
+      const userInfo = await instance.updateUserInfo(userId, userData);
+
+      // Broadcast it
+      const message = {
+        type: 'USERINFO_UPDATE_PASSIVE',
+        userInfo,
+      };
+      console.log('Broadcasting', message);
+      messagesToPublish.push({
+        channel: 'room-' + roomId,
+        messageFormat: new WebSocketMessageFormat(JSON.stringify(message)),
+      });
+
+      break;
+    }
     case 'QUESTION_POST_TO_ROOM': {
       const { roomId, userId, questionId, questionText } = messageContent;
       console.log('Post Question', messageContent);

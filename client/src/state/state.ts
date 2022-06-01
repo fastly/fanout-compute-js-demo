@@ -1,5 +1,5 @@
 import { useReducerWithThunk } from "../util/reducerWithThunk";
-import { QuestionData, QuestionInfo, RoomInfo, UserInfo } from "../../../data/src";
+import { QuestionData, QuestionInfo, RoomData, RoomInfo, UserData, UserInfo } from "../../../data/src";
 
 export interface AppStateFlags {
   joiningRoom: boolean;
@@ -63,20 +63,25 @@ interface ActionSetUserId {
   type: 'USER_SET_ID';
   value: string | null;
 }
-interface ActionSetKnownUserInfo {
+interface ActionSetKnownUserInfo extends UserData {
   type: 'KNOWNUSER_SET_INFO';
   userId: string;
-  displayName: string;
+}
+interface ActionUpdateKnownUserInfo extends Partial<UserData> {
+  type: 'KNOWNUSER_UPDATE_INFO';
+  userId: string;
 }
 interface ActionSetRoomId {
   type: 'ROOM_SET_ID';
   value: string | null;
 }
-interface ActionSetKnownRoomInfo {
+interface ActionSetKnownRoomInfo extends RoomData {
   type: 'KNOWNROOM_SET_INFO';
   roomId: string;
-  displayName: string;
-  themeColor: string;
+}
+interface ActionUpdateKnownRoomInfo extends Partial<RoomData> {
+  type: 'KNOWNROOM_UPDATE_INFO';
+  roomId: string;
 }
 
 interface ActionQuestionDelete {
@@ -116,8 +121,10 @@ export type AppStateAction =
   ActionSetUserId |
   ActionSetIsHost |
   ActionSetKnownUserInfo |
+  ActionUpdateKnownUserInfo |
   ActionSetRoomId |
   ActionSetKnownRoomInfo |
+  ActionUpdateKnownRoomInfo |
   ActionQuestionsForgetAll |
   ActionQuestionSetInfo |
   ActionQuestionUpdateInfo |
@@ -166,6 +173,41 @@ function reducer(state: AppState, action: AppStateAction): AppState {
           },
         },
       };
+    case 'KNOWNROOM_UPDATE_INFO': {
+      const upsertItem: RoomInfo = state.knownRooms[action.roomId] != null ? {
+        ...state.knownRooms[action.roomId]
+      } : {
+        id: action.roomId,
+        displayName: 'New Room:' + action.roomId,
+        themeColor: '#', // default color
+      };
+
+      let needUpdate = false;
+      const keys: (keyof RoomData)[] = [
+        'displayName',
+        'themeColor',
+      ];
+      for(const key of keys) {
+        if(action[key] !== undefined) {
+          (upsertItem as any)[key] = action[key];
+          needUpdate = true;
+        }
+      }
+
+      if(!needUpdate) {
+        return state;
+      }
+
+      const knownRooms = {
+        ...state.knownRooms,
+        [action.roomId]: upsertItem,
+      };
+
+      return {
+        ...state,
+        knownRooms,
+      };
+    }
     case 'USER_SET_ID':
       return {
         ...state,
@@ -182,6 +224,39 @@ function reducer(state: AppState, action: AppStateAction): AppState {
           },
         },
       };
+    case 'KNOWNUSER_UPDATE_INFO': {
+      const upsertItem: UserInfo = state.knownUsers[action.userId] != null ? {
+        ...state.knownUsers[action.userId]
+      } : {
+        id: action.userId,
+        displayName: action.userId,
+      };
+
+      let needUpdate = false;
+      const keys: (keyof UserData)[] = [
+        'displayName',
+      ];
+      for(const key of keys) {
+        if(action[key] !== undefined) {
+          (upsertItem as any)[key] = action[key];
+          needUpdate = true;
+        }
+      }
+
+      if(!needUpdate) {
+        return state;
+      }
+
+      const knownUsers = {
+        ...state.knownUsers,
+        [action.userId]: upsertItem,
+      };
+
+      return {
+        ...state,
+        knownUsers,
+      };
+    }
     case 'QUESTIONS_FORGET_ALL': {
       return {
         ...state,

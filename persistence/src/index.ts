@@ -45,6 +45,11 @@ app.get('/api/user/:userId', asyncHandler(async (req, res) => {
   res.send(JSON.stringify(await instance.getUserInfo(req.params.userId)));
   res.end();
 }));
+app.post('/api/user/:userId/update', asyncHandler(async(req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(await instance.updateUserInfo(req.params.userId, req.body)));
+  res.end();
+}));
 
 app.get('/api/rooms/', asyncHandler (async (req, res) => {
   res.setHeader('Content-Type', 'application/json');
@@ -64,6 +69,11 @@ app.post('/api/rooms/', asyncHandler(async (req, res) => {
 app.get('/api/room/:roomId/full', asyncHandler(async (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.send(JSON.stringify(await instance.getFullRoomInfo(req.params.roomId)));
+  res.end();
+}));
+app.post('/api/room/:roomId/update', asyncHandler(async(req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(await instance.updateRoomInfo(req.params.roomId, req.body)));
   res.end();
 }));
 

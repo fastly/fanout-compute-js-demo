@@ -4,19 +4,25 @@ export interface ConnectionCount {
   count: number;
 }
 
-// Rooms stored in store: <appid>_objects
-// key = room_<id>, value = JSON
-export interface RoomInfo {
-  id: string;
+export interface RoomData {
   displayName: string;
   themeColor: string;
 }
 
+// Rooms stored in store: <appid>_objects
+// key = room_<id>, value = JSON
+export interface RoomInfo extends RoomData {
+  id: string;
+}
+
+export interface UserData {
+  displayName: string;
+}
+
 // Users stored in store: <appid>_objects
 // key = user_<id>, value = JSON
-export interface UserInfo {
+export interface UserInfo extends UserData {
   id: string;
-  displayName: string;
 }
 
 export interface QuestionData {

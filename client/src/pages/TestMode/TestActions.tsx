@@ -41,6 +41,7 @@ export function TestActions() {
                        params={[
                          {paramName: 'displayName',},
                        ]}
+                       exec={async (params) => await actions.updateUserInfo({displayName: params.displayName})}
         />
       </div>
 
@@ -49,6 +50,7 @@ export function TestActions() {
                        params={[
                          {paramName: 'displayName',},
                        ]}
+                       exec={async (params) => await actions.updateRoomInfo({displayName: params.displayName})}
         />
       </div>
 
@@ -57,6 +59,7 @@ export function TestActions() {
                        params={[
                          {paramName: 'themeColor',},
                        ]}
+                       exec={async (params) => await actions.updateRoomInfo({themeColor: params.themeColor})}
         />
       </div>
 

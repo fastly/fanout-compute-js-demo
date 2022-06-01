@@ -1,4 +1,4 @@
-import { ConnectionCount, FullRoomInfo, PersistenceServer, QuestionData, QuestionInfo, RoomInfo, UserInfo } from "../../../data/src";
+import { ConnectionCount, FullRoomInfo, PersistenceServer, QuestionData, QuestionInfo, RoomData, RoomInfo, UserData, UserInfo, } from "../../../data/src";
 
 export class NotFoundError extends Error {}
 export class AlreadyExistsError extends Error {}
@@ -109,6 +109,14 @@ export class Persistence implements PersistenceServer {
 
   async removeSub(channel: string, cid: string): Promise<ConnectionCount> {
     return this.callApi('DELETE', `/api/channel/${channel}/subscription/${cid}`);
+  }
+
+  async updateUserInfo(userId: string, userData: Partial<UserData>): Promise<UserInfo> {
+    return this.callApi('POST', `/api/user/${userId}/update`, userData);
+  }
+
+  async updateRoomInfo(roomId: string, roomData: Partial<RoomData>): Promise<RoomInfo> {
+    return this.callApi('POST', `/api/room/${roomId}/update`, roomData);
   }
 
   async createRoom(roomId: string): Promise<RoomInfo> {
