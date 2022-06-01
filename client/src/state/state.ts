@@ -1,5 +1,18 @@
 import { useReducerWithThunk } from "../util/reducerWithThunk";
-import { QuestionData, QuestionInfo, RoomData, RoomInfo, UserData, UserInfo } from "../../../data/src";
+import {
+  createQuestionInfo,
+  createRoomInfo,
+  createUserInfo,
+  mergeQuestionData,
+  mergeRoomData,
+  mergeUserData,
+  QuestionData,
+  QuestionInfo,
+  RoomData,
+  RoomInfo,
+  UserData,
+  UserInfo
+} from "../../../data/src";
 
 export interface AppStateFlags {
   joiningRoom: boolean;
@@ -176,24 +189,9 @@ function reducer(state: AppState, action: AppStateAction): AppState {
     case 'KNOWNROOM_UPDATE_INFO': {
       const upsertItem: RoomInfo = state.knownRooms[action.roomId] != null ? {
         ...state.knownRooms[action.roomId]
-      } : {
-        id: action.roomId,
-        displayName: 'New Room:' + action.roomId,
-        themeColor: '#', // default color
-      };
+      } : createRoomInfo(action.roomId);
 
-      let needUpdate = false;
-      const keys: (keyof RoomData)[] = [
-        'displayName',
-        'themeColor',
-      ];
-      for(const key of keys) {
-        if(action[key] !== undefined) {
-          (upsertItem as any)[key] = action[key];
-          needUpdate = true;
-        }
-      }
-
+      const needUpdate = mergeRoomData(upsertItem, action);
       if(!needUpdate) {
         return state;
       }
@@ -227,22 +225,9 @@ function reducer(state: AppState, action: AppStateAction): AppState {
     case 'KNOWNUSER_UPDATE_INFO': {
       const upsertItem: UserInfo = state.knownUsers[action.userId] != null ? {
         ...state.knownUsers[action.userId]
-      } : {
-        id: action.userId,
-        displayName: action.userId,
-      };
+      } : createUserInfo(action.userId);
 
-      let needUpdate = false;
-      const keys: (keyof UserData)[] = [
-        'displayName',
-      ];
-      for(const key of keys) {
-        if(action[key] !== undefined) {
-          (upsertItem as any)[key] = action[key];
-          needUpdate = true;
-        }
-      }
-
+      const needUpdate = mergeUserData(upsertItem, action);
       if(!needUpdate) {
         return state;
       }
@@ -277,25 +262,20 @@ function reducer(state: AppState, action: AppStateAction): AppState {
     case 'QUESTION_SET_INFO': {
       const questionIndex = state.questions.findIndex(q => q.id === action.questionId);
 
-      const replacementValue: QuestionInfo = {
-        id: action.questionId,
-        questionText: action.questionText,
-        questionTimestamp: action.questionTimestamp,
-        author: action.author,
-        answerText: action.answerText,
-        answerTimestamp: action.answerTimestamp,
-        answerAuthor: action.answerAuthor,
-        upVotes: action.upVotes,
-      };
+      const upsertItem = questionIndex !== -1 ? {
+        ...state.questions[questionIndex],
+      } : createQuestionInfo(action.questionId, action.questionText, action.author);
+
+      mergeQuestionData(upsertItem, action);
 
       const questions: QuestionInfo[] = questionIndex === -1 ?
         [
           ...state.questions,
-          replacementValue,
+          upsertItem,
         ] :
         [
           ...state.questions.slice(0, questionIndex),
-          replacementValue,
+          upsertItem,
           ...state.questions.slice(questionIndex + 1),
         ];
 
@@ -309,34 +289,9 @@ function reducer(state: AppState, action: AppStateAction): AppState {
 
       const upsertItem: QuestionInfo = questionIndex !== -1 ? {
         ...state.questions[questionIndex],
-      } : {
-        id: action.questionId,
-        questionText: '',
-        questionTimestamp: new Date(),
-        author: '',
-        answerText: null,
-        answerTimestamp: null,
-        answerAuthor: null,
-        upVotes: [],
-      };
+      } : createQuestionInfo(action.questionId, '', '');
 
-      let needUpdate = false;
-      const keys: (keyof QuestionData)[] = [
-        'questionText',
-        'questionTimestamp',
-        'author',
-        'answerText',
-        'answerTimestamp',
-        'answerAuthor',
-        'upVotes',
-      ];
-      for(const key of keys) {
-        if(action[key] !== undefined) {
-          (upsertItem as any)[key] = action[key];
-          needUpdate = true;
-        }
-      }
-
+      const needUpdate = mergeQuestionData(upsertItem, action);
       if(!needUpdate) {
         return state;
       }

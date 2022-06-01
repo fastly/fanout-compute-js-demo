@@ -16,3 +16,20 @@ export function generateId(size: number): string {
     ...BUFFER.slice(0, size * 2)
   );
 }
+
+export function mergeData<TInfo extends TData, TData>(upsertItem: TInfo, keys: (keyof TData)[], data?: Partial<TData>): boolean {
+
+  if(data == null) {
+    return false;
+  }
+
+  let needUpdate = false;
+  for(const key of keys) {
+    if(data[key] !== undefined) {
+      (upsertItem as any)[key] = data[key];
+      needUpdate = true;
+    }
+  }
+  return needUpdate;
+
+}
