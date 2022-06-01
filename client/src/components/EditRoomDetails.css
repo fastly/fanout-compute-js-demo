@@ -1,0 +1,45 @@
+.EditRoomDetails {
+  position: absolute;
+  left: 50%;
+  top: 50px;
+  transform: translate(-50%, 0);
+
+  width: 500px;
+  max-width: calc( 100% - 16px );
+  background: white;
+
+  padding: 8px;
+}
+
+.EditRoomDetails h1 {
+  margin: 0;
+}
+
+.EditRoomDetails .input-group,
+.EditRoomDetails .buttons-area {
+  padding: 16px;
+}
+
+.EditRoomDetails .input-group .label-text {
+  font-size: 18px;
+}
+
+.EditRoomDetails .input-group .input-text-field {
+  font-size: 18px;
+  width: 100%;
+  padding: 8px;
+  cursor: pointer;
+}
+
+
+.EditRoomDetails .buttons-area {
+  text-align: center;
+}
+
+.EditRoomDetails .buttons-area > button {
+  border-radius: 12px;
+  font-size: 16px;
+  padding: 4px 8px;
+  color: white;
+  cursor: pointer;
+}

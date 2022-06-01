@@ -5,6 +5,7 @@ import { RoomInfo, UserInfo } from "../../../../data/src";
 import { useAppController } from "../../state/components/AppControllerProvider";
 import { QuestionsPanel } from "../../components/QuestionsPanel";
 import { EditUserDetails } from "../../components/EditUserDetails";
+import { EditRoomDetails } from "../../components/EditRoomDetails";
 
 type TitleBarProps = {
   userId: string;
@@ -40,7 +41,9 @@ function TitleBar(props: TitleBarProps) {
         </div>
         <div className={"spacer " + (isHost ? " edit-button" : "")}>
           {isHost ? (
-            <button><span className="material-icons">edit</span></button>
+            <button onClick={() => {
+              actions.enterRoomSubUi('edit-room-details', userId, roomInfo);
+            }}><span className="material-icons">edit</span></button>
           ) : null}
         </div>
       </div>
@@ -88,6 +91,10 @@ export function Room() {
   if (appState.subMode === 'edit-user-details') {
     subComponent = (
       <EditUserDetails />
+    );
+  } else if (appState.subMode === 'edit-room-details') {
+    subComponent = (
+      <EditRoomDetails />
     );
   }
 
