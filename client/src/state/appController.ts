@@ -44,7 +44,7 @@ export class AppController {
         const errors: FieldError[] = [];
         // make sure user ID and room ID are valid.
         // 4-16 alphanumeric + underscore, must start with alphabet, must not end with underscore
-        const idValidateRegex = /^[A-Za-z]\w{1,14}[A-Za-z\d]$/;
+        const idValidateRegex = /^[A-Za-z]\w{2,14}[A-Za-z\d]$/;
         if(!idValidateRegex.test(userId)) {
           errors.push({
             fieldName: 'userId',
@@ -56,7 +56,7 @@ export class AppController {
           errors.push({
             fieldName: 'userId',
             errorCode: 'FORMAT',
-            errorDescription: 'User ID must be 4-16 alphanumeric + underscore, must start with alphabet, must not end with underscore',
+            errorDescription: 'Room ID must be 4-16 alphanumeric + underscore, must start with alphabet, must not end with underscore',
           });
         }
         if(errors.length > 0) {
