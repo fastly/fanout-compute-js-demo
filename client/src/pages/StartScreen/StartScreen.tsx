@@ -8,9 +8,10 @@ import './StartScreen.css';
 
 import { FieldError } from "../../state/state";
 import { useAppController } from "../../state/components/AppControllerProvider";
+import { useAppState } from "../../state/components/AppStateProviders";
+import { CreateRoom } from "../CreateRoom/CreateRoom";
 
-export function StartScreen() {
-
+export function StartScreenBody() {
   const formRef = useRef<HTMLFormElement>(null);
 
   const appController = useAppController();
@@ -22,7 +23,12 @@ export function StartScreen() {
   const [ errors, setErrors ] = useState<FieldError[]>();
   const [ submitting, setSubmitting ] = useState<boolean>(false);
 
-  function onError(errorItems: FieldError[]) {
+  async function onError(errorItems: FieldError[]) {
+    if(errorItems.some(x => x.fieldName === 'roomId' && x.errorCode === 'NOTEXIST')) {
+      // We will switch to the Room Creation UI.
+      await appController.startRoomCreationUi(userId, roomId);
+      return;
+    }
     setErrors(errorItems);
   }
 
@@ -96,4 +102,19 @@ export function StartScreen() {
       </div>
     </div>
   );
+}
+
+export function StartScreen() {
+  const appState = useAppState();
+
+  if(appState.subMode === 'room-creation') {
+    return (
+      <CreateRoom />
+    );
+  }
+
+  return (
+    <StartScreenBody />
+  );
+
 }

@@ -1,0 +1,79 @@
+.CreateRoom {
+
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.CreateRoom > .main-area {
+  width: 80%;
+  height: 80%;
+}
+
+.CreateRoom > .main-area > .title {
+
+  font-size: 48px;
+  color: darkblue;
+  text-align: center;
+  margin: 16px 0;
+
+}
+
+
+.CreateRoom > .main-area > .form {
+  margin: 32px auto;
+  font-size: 20px;
+
+  width: 60%;
+}
+.CreateRoom > .main-area > .form .form-message,
+.CreateRoom > .main-area > .form .submit-button-group {
+  text-align: center;
+}
+
+.CreateRoom > .main-area > .form .input-group {
+  margin: 32px 0;
+}
+
+.CreateRoom > .main-area > .form .label-text {
+  font-size: 18px;
+}
+
+.CreateRoom > .main-area > .form .input-text-field {
+  font-size: 18px;
+  width: 100%;
+  padding: 8px;
+}
+
+.CreateRoom > .main-area > .form .input-text-field,
+.CreateRoom > .main-area > .form .input-checkbox-field {
+  cursor: pointer;
+}
+
+.CreateRoom > .main-area > .form .submit-button-group button {
+  font-size: 24px;
+  border: 1px solid black;
+  border-radius: 10px;
+  background: darkblue;
+  color: white;
+  padding: 4px 16px;
+  cursor: pointer;
+}
+
+.CreateRoom > .main-area > .form .error-group {
+  font-size: 16px;
+  color: red;
+}
+
+.CreateRoom > .main-area > .back-label {
+  text-align: center;
+}
+.CreateRoom > .main-area > .back-label > button {
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  text-decoration: underline;
+  color: darkblue;
+}

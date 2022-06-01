@@ -1,0 +1,15 @@
+.ColorPicker {
+  width: 100%;
+}
+
+.ColorPicker .choices {
+  display: flex;
+  justify-content: space-between;
+}
+.ColorPicker .choices .item {
+  border: 4px solid gray;
+  cursor: pointer;
+}
+.ColorPicker .choices .item.selected {
+  border: 4px solid black;
+}

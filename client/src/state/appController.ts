@@ -292,6 +292,22 @@ export class AppController {
       this.wsContext.send(JSON.stringify(payload));
     });
   }
+  async startRoomCreationUi(userId: string, roomId: string) {
+    this.dispatch({
+      type: 'MODE_SUBMODE_SWITCH_TO',
+      subMode: 'room-creation',
+      params: {
+        userId,
+        roomId,
+      },
+    });
+  }
+  async leaveRoomCreationUi() {
+    this.dispatch({
+      type: 'MODE_SUBMODE_SWITCH_TO',
+      subMode: undefined,
+    });
+  }
   async updateRoomInfo(roomData: Partial<RoomData>) {
     if(!this.isWebsocketConnected()) {
       return;
