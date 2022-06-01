@@ -320,6 +320,7 @@ function reducer(state: AppState, action: AppStateAction): AppState {
         upVotes: [],
       };
 
+      let needUpdate = false;
       const keys: (keyof QuestionData)[] = [
         'questionText',
         'questionTimestamp',
@@ -332,7 +333,12 @@ function reducer(state: AppState, action: AppStateAction): AppState {
       for(const key of keys) {
         if(action[key] !== undefined) {
           (upsertItem as any)[key] = action[key];
+          needUpdate = true;
         }
+      }
+
+      if(!needUpdate) {
+        return state;
       }
 
       const questions: QuestionInfo[] = questionIndex !== -1 ? [
