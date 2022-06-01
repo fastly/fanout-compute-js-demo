@@ -1,0 +1,44 @@
+.EditUserDetails {
+  position: absolute;
+  top: 50px;
+  right: 8px;
+
+  width: 500px;
+  max-width: calc( 100% - 16px );
+  background: white;
+
+  padding: 8px;
+}
+
+.EditUserDetails h1 {
+  margin: 0;
+}
+
+.EditUserDetails .input-group,
+.EditUserDetails .buttons-area {
+  padding: 16px;
+}
+
+.EditUserDetails .input-group .label-text {
+  font-size: 18px;
+}
+
+.EditUserDetails .input-group .input-text-field {
+  font-size: 18px;
+  width: 100%;
+  padding: 8px;
+  cursor: pointer;
+}
+
+
+.EditUserDetails .buttons-area {
+  text-align: center;
+}
+
+.EditUserDetails .buttons-area > button {
+  border-radius: 12px;
+  font-size: 16px;
+  padding: 4px 8px;
+  color: white;
+  cursor: pointer;
+}

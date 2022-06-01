@@ -477,6 +477,22 @@ export class AppController {
       subMode: undefined,
     });
   }
+  enterRoomSubUi(subModeName: string, userId: string, roomInfo: RoomInfo) {
+    this.dispatch({
+      type: 'MODE_SUBMODE_SWITCH_TO',
+      subMode: subModeName,
+      params: {
+        userId,
+        roomInfo,
+      },
+    });
+  }
+  leaveRoomSubUi() {
+    this.dispatch({
+      type: 'MODE_SUBMODE_SWITCH_TO',
+      subMode: undefined,
+    });
+  }
   upVoteQuestion(questionId: string, removeUpvote: boolean) {
     if(!this.isWebsocketConnected()) {
       // make sure we only upVote questions when

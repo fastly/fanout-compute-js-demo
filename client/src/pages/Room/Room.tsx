@@ -1,8 +1,10 @@
+import { ReactNode } from "react";
 import './Room.css';
 import { useAppState } from "../../state/components/AppStateProviders";
 import { RoomInfo, UserInfo } from "../../../../data/src";
 import { useAppController } from "../../state/components/AppControllerProvider";
 import { QuestionsPanel } from "../../components/QuestionsPanel";
+import { EditUserDetails } from "../../components/EditUserDetails";
 
 type TitleBarProps = {
   userId: string;
@@ -44,7 +46,9 @@ function TitleBar(props: TitleBarProps) {
       </div>
       <div className="spacer user-name-section">
         <div className="username">{userInfo != null ? userInfo.displayName : userId}</div>
-        <button><span className="material-icons">expand_more</span></button>
+        <button onClick={() => {
+          actions.enterRoomSubUi('edit-user-details', userId, roomInfo);
+        }}><span className="material-icons">expand_more</span></button>
       </div>
     </div>
   );
@@ -80,6 +84,13 @@ export function Room() {
     return null;
   }
 
+  let subComponent: ReactNode | null = null;
+  if (appState.subMode === 'edit-user-details') {
+    subComponent = (
+      <EditUserDetails />
+    );
+  }
+
   return (
     <div className="Room">
       <TitleBar userId={appState.currentUserId}
@@ -88,6 +99,7 @@ export function Room() {
                 isHost={appState.isHost}
       />
       <QuestionsArea roomInfo={appState.knownRooms[appState.currentRoomId]} />
+      {subComponent}
     </div>
   );
 
