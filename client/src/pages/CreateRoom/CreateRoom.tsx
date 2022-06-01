@@ -4,15 +4,7 @@ import { useAppState } from "../../state/components/AppStateProviders";
 import { useAppController } from "../../state/components/AppControllerProvider";
 import { FieldError } from "../../state/state";
 import { ColorPicker } from "../../components/ColorPicker";
-
-const themeColors = [
-  '#038cfc',
-  '#d35192',
-  '#188c2d',
-  '#765f09',
-  '#6e1786',
-  '#af2c37',
-];
+import { THEME_COLORS } from "../../constants";
 
 export function CreateRoom() {
 
@@ -108,7 +100,7 @@ export function CreateRoom() {
                 Pick a theme color for your room.
               </div>
               <div>
-                <ColorPicker choices={themeColors} size="60px" value={roomThemeColor} onChange={(value) => setRoomThemeColor(value)}/>
+                <ColorPicker choices={THEME_COLORS} size="60px" value={roomThemeColor} onChange={(value) => setRoomThemeColor(value)}/>
               </div>
             </div>
 
