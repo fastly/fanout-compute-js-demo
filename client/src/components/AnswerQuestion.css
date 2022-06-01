@@ -1,0 +1,42 @@
+.AnswerQuestion {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  transform: translate(-50%, -30%);
+
+  width: 500px;
+  background: white;
+
+  padding: 8px;
+}
+
+.AnswerQuestion h1 {
+  margin: 0;
+}
+
+.AnswerQuestion .question-text-area,
+.AnswerQuestion .answer-area,
+.AnswerQuestion .upvotes-area,
+.AnswerQuestion .buttons-area {
+  padding: 16px;
+}
+
+.AnswerQuestion .answer-area {
+  height: 80px;
+}
+.AnswerQuestion .answer-area .textentry {
+  height: 100%;
+  width: 100%;
+}
+
+.AnswerQuestion .buttons-area {
+  text-align: center;
+}
+
+.AnswerQuestion .buttons-area > button {
+  border-radius: 12px;
+  font-size: 16px;
+  padding: 4px 8px;
+  color: white;
+  cursor: pointer;
+}

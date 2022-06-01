@@ -5,6 +5,7 @@ import { QuestionInfo, RoomInfo, UserInfo } from "../../../data/src";
 import { useAppController } from "../state/components/AppControllerProvider";
 import TimeAgo from 'react-timeago';
 import { DeleteQuestion } from "./DeleteQuestion";
+import { AnswerQuestion } from "./AnswerQuestion";
 
 type QuestionItemProps = {
   userId: string;
@@ -89,15 +90,17 @@ export function QuestionItem(props: QuestionItemProps) {
         </div>
         {isHost ? (
           <div className="actions">
-            <div className="reply">
-              <button className="reply"
-                      style={{
-                        border: "1px solid " + roomInfo.themeColor,
-                      }}
-                      title="Reply"
-                      onClick={() => controller.upVoteQuestion(questionInfo.id, selfUpVoted)}
-              ><span className="material-icons thumbs-up-icon">reply</span></button>
-            </div>
+            {!answered ? (
+              <div className="reply">
+                <button className="reply"
+                        style={{
+                          border: "1px solid " + roomInfo.themeColor,
+                        }}
+                        title="Reply"
+                        onClick={() => controller.enterQuestionUi('answer', userId, roomInfo, questionInfo)}
+                ><span className="material-icons thumbs-up-icon">reply</span></button>
+              </div>
+            ) : null}
             <div className="delete">
               <button className="delete"
                       style={{
@@ -234,7 +237,11 @@ export function QuestionsPanel() {
   }
 
   let subComponent: ReactNode | null = null;
-  if (state.subMode === 'delete') {
+  if (state.subMode === 'answer') {
+    subComponent = (
+      <AnswerQuestion />
+    );
+  } else if (state.subMode === 'delete') {
     subComponent = (
       <DeleteQuestion />
     );
