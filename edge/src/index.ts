@@ -128,13 +128,13 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
   }
 
   console.log('incoming ', wsContext.id);
-  wsContext.sendControl(createWebSocketControlMessage('keep-alive', { content: '{}', timeout: 20 }))
 
   // If this is a new connection, accept it and subscribe it to a channel
   if (wsContext.isOpening()) {
     console.log('is opening');
     wsContext.accept();
     wsContext.subscribe('room-' + roomId);
+    wsContext.sendControl(createWebSocketControlMessage('keep-alive', { content: '{}', timeout: 20 }))
     try {
       await instance.addSub('room-' + roomId, wsContext.id);
     } catch {
