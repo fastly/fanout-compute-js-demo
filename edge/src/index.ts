@@ -70,7 +70,7 @@ router.get('/api/room/:roomId/full', async (req, res) => {
 router.get('/api/room/:roomId/questions', async (req, res) => {
   await processAndSendJsonResult(res, async () => await instance.getQuestionsForRoom(req.params.roomId));
 });
-router.get('/api/users/', async (req, res) => {
+router.get('/api/users', async (req, res) => {
   await processAndSendJsonResult(res, async () => await instance.getKnownUsers());
 });
 router.get('/api/user/:userId', async (req, res) => {
