@@ -2,6 +2,7 @@
   "name": "fastly-compute-js-demo",
   "private": true,
   "license": "MIT",
+  "engines": { "node": "16.x" },
   "scripts": {
     "build": "yarn build-libs && yarn build-apps",
     "build-libs": "yarn build-libs:expressly && yarn build-libs:js-grip && yarn build-libs:js-serve-grip && yarn build-libs:js-grip-compute-js && yarn build-libs:js-serve-grip-expressly",
@@ -13,6 +14,7 @@
     "build-apps": "yarn build-apps:persistence && yarn build-apps:client && yarn build-apps:edge",
     "build-apps:persistence": "cd persistence && yarn --check-files && yarn build",
     "build-apps:client": "cd client && yarn --check-files && yarn build",
-    "build-apps:edge": "cd edge && yarn --check-files && yarn build"
+    "build-apps:edge": "cd edge && .yarn --check-files && yarn build",
+    "start": "cd persistence && npm run dev"
   }
 }
