@@ -1,9 +1,10 @@
+import 'dotenv/config';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { instance, AlreadyExistsError, NotFoundError } from './PersistenceApiServer';
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT ?? 3000;
 
 app.use(cors());
 app.use(express.json());
