@@ -40,6 +40,7 @@ export class Persistence implements PersistenceServer {
           'Content-Type': 'application/json',
         },
         body: fetchBody,
+        cacheOverride: new CacheOverride('pass'),
       });
     } catch (ex) {
       throw new HttpError(500, 'Fetch error: ' + String(ex));
