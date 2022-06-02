@@ -1,5 +1,5 @@
-
 import { ConnectionCount, FullRoomInfo, QuestionInfo, RoomInfo, Server, UserInfo } from "../../../data/src";
+import { API_URL_BASE } from "../constants";
 
 export class ApiServer implements Server {
   constructor(protected baseUrl: string) {}
@@ -42,4 +42,4 @@ export class ApiServer implements Server {
   }
 }
 
-export const instance = new ApiServer('http://localhost:7999');
+export const instance = new ApiServer(API_URL_BASE);

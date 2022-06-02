@@ -7,3 +7,6 @@ export const THEME_COLORS = [
   '#af2c37',
 ];
 
+export const WEBSOCKET_URL_BASE = 'ws://localhost:7999/api/websocket';
+export const API_URL_BASE = 'http://localhost:7999/';
+export const PERSISTENCE_API_URL_BASE = 'http://localhost:3001/';

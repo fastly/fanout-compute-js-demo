@@ -3,6 +3,7 @@ import { AppState, AppStateAction, FieldError } from "./state";
 import { WebSocketContextValue } from "../websocket/components/WebSocketProviders";
 import { instance } from "../services/ApiServer";
 import { FullRoomInfo, generateId, QuestionInfo, RoomData, RoomInfo, UserData, UserInfo, } from "../../../data/src";
+import { WEBSOCKET_URL_BASE } from "../constants";
 
 export class AppController {
   constructor(
@@ -13,7 +14,7 @@ export class AppController {
     return this.wsContext.getSocket() != null;
   }
   openWs(roomId: string) {
-    this.wsContext.open('ws://localhost:7999/api/websocket?roomId=' + roomId);
+    this.wsContext.open(WEBSOCKET_URL_BASE + '?roomId=' + roomId);
   }
   closeWs() {
     this.wsContext.close();

@@ -1,5 +1,6 @@
 import { ConnectionCount, PersistenceServer, QuestionData, QuestionInfo, RoomData, RoomInfo, UserData, UserInfo, } from "../../../data/src";
 import { ApiServer } from "./ApiServer";
+import { PERSISTENCE_API_URL_BASE } from "../constants";
 
 export class PersistenceApiServer extends ApiServer
   implements PersistenceServer {
@@ -31,4 +32,4 @@ export class PersistenceApiServer extends ApiServer
 
 }
 
-export const instance = new PersistenceApiServer('http://localhost:3001/');
+export const instance = new PersistenceApiServer(PERSISTENCE_API_URL_BASE);
