@@ -1,4 +1,5 @@
 import { ConnectionCount, FullRoomInfo, PersistenceServer, QuestionData, QuestionInfo, RoomData, RoomInfo, UserData, UserInfo, } from "../../../data/src";
+import { PERSISTENCE_BACKEND, PERSISTENCE_URL_BASE } from "../env";
 
 export class NotFoundError extends Error {}
 export class AlreadyExistsError extends Error {}
@@ -8,11 +9,8 @@ export class HttpError extends Error {
   }
 }
 
+// A backend app. Currently we use this (maybe until we have object store working)
 export class Persistence implements PersistenceServer {
-
-  // proxy to this backend until we have object store working
-  persistenceBackend = 'backend-persistence';
-  persistenceUrlBase = 'http://localhost:3001/';
 
   async callApi(method: string, path: string, body?: string | {}): Promise<any> {
 
@@ -21,7 +19,7 @@ export class Persistence implements PersistenceServer {
     // 'https://www.example.com/path/' with '/api/rooms' should give
     // 'https://www.example.com/path/api/rooms'
     const segments = [
-      String(new URL('.' + pathname, this.persistenceUrlBase)),
+      String(new URL('.' + pathname, PERSISTENCE_URL_BASE)),
       searchParams != null ? searchParams : '',
     ];
     const proxyUrl = segments
@@ -37,7 +35,7 @@ export class Persistence implements PersistenceServer {
     try {
       res = await fetch(proxyUrl, {
         method,
-        backend: this.persistenceBackend,
+        backend: PERSISTENCE_BACKEND,
         headers: {
           'Content-Type': 'application/json',
         },
