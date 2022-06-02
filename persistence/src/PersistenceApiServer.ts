@@ -14,7 +14,7 @@ import {
   mergeRoomData,
   mergeUserData,
   mergeQuestionData
-} from "../../data/src";
+} from "../../data";
 
 export class NotFoundError extends Error {}
 export class AlreadyExistsError extends Error {}

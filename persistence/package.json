@@ -16,6 +16,6 @@
   },
   "scripts": {
     "dev": "tsc --build && ts-node ./src/index.ts",
-    "build": "tsc"
+    "build": "tsc --build"
   }
 }

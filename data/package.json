@@ -1,0 +1,9 @@
+{
+  "name": "data",
+  "private": true,
+  "main": "./build/index.js",
+  "types": "./build/index.d.ts",
+  "devDependencies": {
+    "typescript": "^4.7.2"
+  }
+}
