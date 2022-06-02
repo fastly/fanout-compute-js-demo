@@ -7,12 +7,10 @@ import { GripExpresslyRequest, GripExpresslyResponse, ServeGrip } from "@fastly/
 import { createWebSocketControlMessage, WebSocketMessageFormat } from "@fanoutio/grip";
 import { AlreadyExistsError, HttpError, NotFoundError, Persistence } from "./services/Persistence";
 import { UserInfo } from "../../data/src";
+import { GRIP_URL } from "./env";
 
 const serveGrip = new ServeGrip({
-  grip: {
-    control_uri: 'http://localhost:5561/',
-    backend: 'grip-publisher',
-  }
+  grip: GRIP_URL,
 });
 
 const router = new Router();
@@ -362,6 +360,10 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
 
   res.setHeader('Keep-Alive-Interval', '20');
   res.end('');
+});
+
+router.get('/', async (req, res) => {
+  res.end('OK');
 });
 
 router.listen();
