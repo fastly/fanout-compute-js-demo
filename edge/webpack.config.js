@@ -32,6 +32,7 @@ module.exports = {
     // or core nodejs modules needed for your application.
     new ProvidePlugin({
       process: "process",
+      Buffer: [ "buffer", "Buffer" ],
     })
   ],
   resolve: {
