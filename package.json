@@ -4,17 +4,11 @@
   "license": "MIT",
   "engines": { "node": "16.x" },
   "scripts": {
-    "build": "yarn build-libs && yarn build-apps",
-    "build-libs": "yarn build-libs:expressly && yarn build-libs:js-grip && yarn build-libs:js-serve-grip && yarn build-libs:js-grip-compute-js && yarn build-libs:js-serve-grip-expressly",
-    "build-libs:expressly": "cd libs/expressly && yarn --check-files && yarn build",
-    "build-libs:js-grip": "cd libs/js-grip && yarn --check-files && yarn build-package",
-    "build-libs:js-serve-grip": "cd libs/js-serve-grip && yarn --check-files && yarn build-package",
-    "build-libs:js-grip-compute-js": "cd libs/js-grip-compute-js && yarn --check-files && yarn build-package",
-    "build-libs:js-serve-grip-expressly": "cd libs/js-serve-grip-expressly && yarn --check-files && yarn build-package",
-    "build-apps": "yarn build-apps:persistence && yarn build-apps:client && yarn build-apps:edge",
-    "build-apps:persistence": "cd persistence && yarn --check-files && yarn build",
-    "build-apps:client": "cd client && yarn --check-files && yarn build",
-    "build-apps:edge": "cd edge && .yarn --check-files && yarn build",
+    "build": "npm run build-apps",
+    "build-apps": "npm run build-apps:persistence && npm run build-apps:client && npm run build-apps:edge",
+    "build-apps:persistence": "cd persistence && npm run build",
+    "build-apps:client": "cd client && npm run build",
+    "build-apps:edge": "cd edge && npm run build",
     "start": "cd persistence && npm run dev"
   }
 }
