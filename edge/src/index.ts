@@ -16,6 +16,10 @@ const serveGrip = new ServeGrip({
 const router = new Router();
 router.use(serveGrip as any);
 
+router.use(async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+});
+
 const instance = new Persistence();
 async function processAndSendJsonResult(res: EResponse, fn: () => {} | Promise<{}>) {
 
