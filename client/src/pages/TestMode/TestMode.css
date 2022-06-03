@@ -53,6 +53,7 @@
   grid-gap: 0;
   grid-template-rows: 50% 50%;
   grid-template-columns: 50% 50%;
+  min-width: 0;
 }
 
 @media only screen and (max-width: 767px) {
