@@ -2,12 +2,21 @@
 <html>
 <head lang="en">
     <title>Interactive Question &amp; Answer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
       html {
         box-sizing: border-box;
       }
       *, *:before, *:after {
         box-sizing: inherit;
+      }
+
+      @supports (-webkit-overflow-scrolling: touch) {
+        select,
+        textarea,
+        input {
+          font-size: 16px;
+        }
       }
 
       .material-icons {
