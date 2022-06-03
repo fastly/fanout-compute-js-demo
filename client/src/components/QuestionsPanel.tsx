@@ -230,6 +230,19 @@ export function QuestionEntry() {
   );
 }
 
+export function QuestionPrompt() {
+  return (
+    <div className="QuestionPrompt">
+      <p>
+        It looks like there are no questions in this room yet.
+      </p>
+      <p>
+        Use the form below to ask the first question!
+      </p>
+    </div>
+  );
+}
+
 export function QuestionsPanel() {
 
   const state = useAppState();
@@ -261,6 +274,9 @@ export function QuestionsPanel() {
       />
       <QuestionEntry />
       {subComponent}
+      {state.questions.length === 0 ? (
+        <QuestionPrompt />
+      ) : null}
     </div>
   );
 }

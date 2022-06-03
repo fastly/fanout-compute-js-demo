@@ -5,6 +5,8 @@
 
   display: grid;
   grid-template-rows: 1fr 140px;
+
+  position: relative;
 }
 
 .QuestionItem {
@@ -132,4 +134,13 @@
   background: white;
   border: 1px solid white;
   cursor: pointer;
+}
+
+.QuestionPrompt {
+  position: absolute;
+  width: 100%;
+  top: 5%;
+  left: 0;
+  text-align: center;
+  font-size: 18px;
 }
