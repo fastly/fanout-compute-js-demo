@@ -18,6 +18,7 @@ router.use(serveGrip as any);
 
 router.use(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers');
 });
 
 const instance = new Persistence();
@@ -364,6 +365,32 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
 
   res.setHeader('Keep-Alive-Interval', '20');
   res.end('');
+});
+
+router.get('/api/publishtest', async (req, res) => {
+
+  const publisher = serveGrip.getPublisher();
+  await publisher.publishHttpStream('test', 'test\n');
+
+  res.end('OK');
+
+});
+
+router.get('/api/accesstest', async (req, res) => {
+
+  const response = await fetch('https://fanout.fastly.com/', {
+    backend: 'grip-publisher',
+  });
+
+  const resHeaders: Record<string, string> = {};
+  for(const [key, value] of response.headers.entries()) {
+    resHeaders[key] = value;
+  }
+
+  console.log('response', {status: response.status});
+
+  res.end(await response.text());
+
 });
 
 router.get('/', async (req, res) => {
