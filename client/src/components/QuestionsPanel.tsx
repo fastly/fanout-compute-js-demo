@@ -1,11 +1,14 @@
-import { ReactNode, useState } from "react";
+import { forwardRef, LegacyRef, ReactNode, useState } from "react";
+import TimeAgo from 'react-timeago';
 import './QuestionsPanel.css';
 import { useAppState } from "../state/components/AppStateProviders";
 import { QuestionInfo, RoomInfo, UserInfo } from "../../../data/src";
 import { useAppController } from "../state/components/AppControllerProvider";
-import TimeAgo from 'react-timeago';
 import { DeleteQuestion } from "./DeleteQuestion";
 import { AnswerQuestion } from "./AnswerQuestion";
+import FlipMove from '../util/components/FlipMove';
+
+export const QuestionItemForwardRef = forwardRef(QuestionItem);
 
 type QuestionItemProps = {
   userId: string;
@@ -14,7 +17,7 @@ type QuestionItemProps = {
   questionInfo: QuestionInfo;
   isHost: boolean;
 };
-export function QuestionItem(props: QuestionItemProps) {
+export function QuestionItem(props: QuestionItemProps, ref: LegacyRef<HTMLDivElement>) {
 
   const controller = useAppController();
 
@@ -38,7 +41,8 @@ export function QuestionItem(props: QuestionItemProps) {
   const selfUpVoted = questionInfo.upVotes.includes(userId);
 
   return (
-    <div className={"QuestionItem" + (answered ? ' answered' : '') + (selfUpVoted ? ' selfUpVoted' : '')}
+    <div ref={ref}
+         className={"QuestionItem" + (answered ? ' answered' : '') + (selfUpVoted ? ' selfUpVoted' : '')}
          style={{
            ...answered ? { border: '2px solid ' + roomInfo.themeColor } : {},
          }}
@@ -174,17 +178,17 @@ export function QuestionsList(props: QuestionsListProps) {
   sortedQuestions.reverse();
 
   return (
-    <div className="QuestionsList">
+    <FlipMove className="QuestionsList">
       {sortedQuestions.map(q => (
-        <QuestionItem key={q.id}
-                      userId={userId}
-                      knownUsers={knownUsers}
-                      roomInfo={roomInfo}
-                      questionInfo={q}
-                      isHost={isHost}
+        <QuestionItemForwardRef key={q.id}
+                                userId={userId}
+                                knownUsers={knownUsers}
+                                roomInfo={roomInfo}
+                                questionInfo={q}
+                                isHost={isHost}
         />
       ))}
-    </div>
+    </FlipMove>
   );
 }
 
