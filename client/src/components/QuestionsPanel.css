@@ -110,6 +110,7 @@
 .QuestionEntry {
   display: grid;
   grid-template-rows: 24px 1fr 32px;
+  padding: 0 4px;
 }
 
 .QuestionEntry > .question-entryarea {
