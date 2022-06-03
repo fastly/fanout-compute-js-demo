@@ -6,7 +6,7 @@ console.log(path.resolve(__dirname, "./build/shims/process"));
 module.exports = {
   entry: "./build/index.js",
   optimization: {
-    minimize: false
+    minimize: true,
   },
   target: "webworker",
   output: {
