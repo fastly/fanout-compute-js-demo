@@ -65,7 +65,13 @@ export function StartScreenBody() {
                   Enter your username:
                 </div>
                 <div>
-                  <input className="input-text-field" type="text" value={userId} onChange={e => setUserId(e.target.value)}/>
+                  <input className="input-text-field"
+                         type="text"
+                         value={userId}
+                         autoCapitalize="off"
+                         onChange={e => setUserId(e.target.value)}
+                         onBlur={e => setUserId(e.target.value.trim().toLowerCase())}
+                  />
                 </div>
               </label>
             </div>
@@ -76,7 +82,13 @@ export function StartScreenBody() {
                   Enter the ID of the room that you want to join.
                 </div>
                 <div>
-                  <input className="input-text-field" type="text" value={roomId} onChange={e => setRoomId(e.target.value)}/>
+                  <input className="input-text-field"
+                         type="text"
+                         value={roomId}
+                         autoCapitalize="off"
+                         onChange={e => setRoomId(e.target.value)}
+                         onBlur={e => setRoomId(e.target.value.trim().toLowerCase())}
+                  />
                 </div>
                 <div>
                   <label className="input-checkbox-field"><input type="checkbox" checked={asHost} onChange={e => setAsHost(e.target.checked)} /> Join as Host</label>

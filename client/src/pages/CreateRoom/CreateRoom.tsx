@@ -71,12 +71,23 @@ export function CreateRoom() {
                   ID of the room to create:
                 </div>
                 <div>
-                  <input className="input-text-field" type="text" value={roomId} onChange={e => {
-                    setRoomId(e.target.value);
-                    if(!haveEditedRoomDisplayName) {
-                      setRoomDisplayName('New Room: ' + e.target.value);
-                    }
-                  }}/>
+                  <input className="input-text-field"
+                         type="text"
+                         value={roomId}
+                         autoCapitalize="off"
+                         onChange={e => {
+                           setRoomId(e.target.value);
+                           if(!haveEditedRoomDisplayName) {
+                             setRoomDisplayName('New Room: ' + e.target.value);
+                           }
+                         }}
+                         onBlur={e => {
+                           if(!haveEditedRoomDisplayName) {
+                             setRoomDisplayName('New Room: ' + e.target.value.trim());
+                           }
+                           setRoomId(e.target.value.trim().toLowerCase());
+                         }}
+                  />
                 </div>
               </label>
             </div>
@@ -87,10 +98,14 @@ export function CreateRoom() {
                   Pick a friendly name for your room.
                 </div>
                 <div>
-                  <input className="input-text-field" type="text" value={roomDisplayName} onChange={e => {
-                    setRoomDisplayName(e.target.value);
-                    setHaveEditedRoomDisplayName(true);
-                  }}/>
+                  <input className="input-text-field"
+                         type="text"
+                         value={roomDisplayName}
+                         onChange={e => {
+                           setRoomDisplayName(e.target.value);
+                           setHaveEditedRoomDisplayName(true);
+                         }}
+                  />
                 </div>
               </label>
             </div>

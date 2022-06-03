@@ -66,6 +66,7 @@ export function TestOperation(props: Props) {
               <label>
                 {param.paramName}:{' '}
                 <input type="text"
+                       autoCapitalize="off"
                        value={String(values[param.paramName] as number)}
                        onChange={(e) => {
                          setValues({ ...values, [param.paramName]: e.target.value });
@@ -83,9 +84,13 @@ export function TestOperation(props: Props) {
               <label>
                 {param.paramName}:{' '}
                 <input type="text"
+                       autoCapitalize="off"
                        value={values[param.paramName] as string}
                        onChange={(e) => {
                          setValues({ ...values, [param.paramName]: e.target.value });
+                       }}
+                       onBlur={(e) => {
+                         setValues({ ...values, [param.paramName]: e.target.value.trim() });
                        }}
                 />
               </label>

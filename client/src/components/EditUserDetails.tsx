@@ -32,9 +32,16 @@ export function EditUserDetails() {
             Pick a friendly name for your user.
           </div>
           <div>
-            <input className="input-text-field" type="text" value={displayName} onChange={e => {
-              setDisplayName(e.target.value);
-            }}/>
+            <input className="input-text-field"
+                   type="text"
+                   value={displayName}
+                   onChange={e => {
+                     setDisplayName(e.target.value);
+                   }}
+                   onBlur={e => {
+                     setDisplayName(e.target.value.trim());
+                   }}
+            />
           </div>
         </label>
       </div>
