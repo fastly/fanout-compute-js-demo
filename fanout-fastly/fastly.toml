@@ -1,0 +1,9 @@
+# This file describes a Fastly Compute@Edge package. To learn more visit:
+# https://developer.fastly.com/reference/fastly-toml/
+
+authors = ["komuro@fastly.com"]
+description = "Enables Fastly Fanout by upgrading websocket connections and forwarding other requests."
+language = "rust"
+manifest_version = 2
+name = "fanout-fastly"
+service_id = ""
