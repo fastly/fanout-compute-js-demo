@@ -27,8 +27,8 @@ In this example, the origin is also a Compute@Edge app, written in JavaScript.
 
 Visit [https://qa-websockets-demo.edgecompute.app/](https://qa-websockets-demo.edgecompute.app/) to see this demo in action.
 
-This demo is meant to be a live-updating "question and answer" board for a live event, online or offline. Attendees at
-an event join a room and may post questions. The organizer is able to reply to questions or delete them. The changes
+This demo is a realtime-updating "question and answer" board for a live event, online or offline. Attendees at
+an event join a room and may post questions. The organizer is able to reply to the questions or delete them. The changes
 propagate immediately to all connected participants over WebSocket.
 
 Try:
@@ -54,8 +54,6 @@ are seen by other users too.
 * Finally, you can change the way your own name is displayed. Tap the down arrow by your username up top, and enter a new name.
 Everyone will see those changes right away.
 
-Pretty amazing, isn't it?
-
 ## Structure
 
 This app comprises four components:
@@ -72,30 +70,33 @@ and the visitor interacts with the app. The `client` app is written as a React a
 `/api/websocket?roomId=<roomname>` endpoint on `demo-frontend`. Once the user is in a room, interactions with the app are
 sent over the WebSocket.
 
-`demo-frontend` is a Compute@Edge app (written in Rust) that forwards API calls to `origin`. Importantly, the WebSocket
-interactions are 'upgraded' by the `upgrade_websocket` call. When this happens, Fastly Fanout technology on that POP will
-maintain the WebSocket connection with that client, and begin translating the WebSocket messages into HTTP, via the
-[WebSocket-Over-HTTP Protocol](https://pushpin.org/docs/protocols/websocket-over-http/). This way, all API calls (REST
-and WebSocket) are HTTP requests by the time they reach `origin`.
+`demo-frontend` is a Compute@Edge app (written in Rust) that forwards API requests to `origin`. Importantly, when a client
+sends a request to open a WebSocket, that request is 'upgraded' by the `upgrade_websocket` as it is forwarded.
+After this upgrade, Fastly Fanout will hold and continue to hold the WebSocket connection with the client. Moreover, it will
+translate any WebSocket messages into HTTP, via the [WebSocket-Over-HTTP Protocol](https://pushpin.org/docs/protocols/websocket-over-http/).
+Therefore, together with the other REST API calls that are forwarded, all API calls are HTTP requests by the time they reach
+`origin`.
 
 `origin` is written as a Compute@Edge app in JavaScript. This app uses Fastly's [Expressly](https://github.com/fastly/expressly)
-for routing, and [`js-serve-grip`](https://github.com/fanout/js-serve-grip) as a middleware library to interact with Fastly
-Fanout's data structures. It is able to discern when when an incoming request has come through Fastly and has been upgraded.
-And if so, it also parses any of the headers and WebSocket messages into objects that are easy to interact with.
+for routing, and `js-serve-grip-expressly` as a middleware library to work with [GRIP](https://pushpin.org/docs/protocols/grip/),
+the protocol used by Fastly Fanout for realtime. This middle is able to discern whether an incoming request has
+come through Fastly and has been upgraded. And if so, it parses relevant headers and WebSocket messages into objects
+that are easy to interact with.
 
-The `POST /api/websocket` route is the most important, where it handles all WebSocket activity. It's important to understand
-that this route is called once for each activity, including connecting and disconnecting, that occurs over the lifetime of
-a WebSocket between a single browser window and Fastly. In this route, a new connection is registered with a channel name.
-Any incoming WebSocket messages are iterated and individually processed. Some of these interactions will, in turn, need to
-broadcast messages to all connected clients. For this purpose, it uses the underlying GRIP mechanism to post a message, tagged
-with a channel name, to a publishing endpoint (identified by a GRIP_URL).
+The `POST /api/websocket` route is central, as it handles all WebSocket activity. Keep in mind that this route is called
+once for every activity that comes in over that WebSocket over its lifetime between a single browser window and Fastly,
+including connecting and disconnecting, as well as the individual messages sent from the client. In this app, this route
+handler handles a new connection by registering it with a channel name, and then iterating any incoming WebSocket messages
+to individually process them. Some of this processing will, in turn, result in a need to broadcast messages to all connected
+clients. For this purpose, it uses the underlying GRIP mechanism to post a message, tagged with the channel name, to a
+publishing endpoint (identified by a GRIP_URL).
 
 Sending to the publishing endpoint will cause Fastly to propagate this message to all `client` instances connected and
-listening on that channel. The `client` now handles the incoming WebSocket message, by updating local state and UI. 
+listening on that channel. The `client` now handles the WebSocket message received from the server, by updating local
+state and UI. 
 
-It's important to note that these WebSocket connections are not peer-to-peer. When realtime activity occurs, such as when
-a visitor submits a question, or when the host submits an answer, the messages travels from that user's browser window
-through the WebSocket to Fastly. `origin` handles the request at the edge, including saving the data to storage and
-issuing a message to the publisher endpoint. In any case, all messaging takes place between the browser and Fastly and
+These WebSocket connections are not peer-to-peer, although it may feel that way at times. When realtime activity occurs,
+such as when a visitor submits a question, or when the host submits an answer, the messages travels from that user's
+browser window through the WebSocket to Fastly. `origin` handles the request, at the edge, sometimes issuing a message
+to the publisher endpoint. In any case, all messaging takes place between the browser and Fastly, and then from Fastly to
 the many other browsers connected to Fastly.
-
