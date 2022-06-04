@@ -8,6 +8,8 @@
   background: white;
 
   padding: 8px;
+
+  max-width: calc(100% - 16px);
 }
 
 .AnswerQuestion h1 {
