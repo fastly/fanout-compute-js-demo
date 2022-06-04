@@ -40,22 +40,22 @@ fn main() -> Result<(), Error> {
     let response_with_content = match path {
         "/main.js" => {
             response
-                .with_content_type(mime::APPLICATION_JAVASCRIPT)
+                .with_content_type(mime::APPLICATION_JAVASCRIPT_UTF_8)
                 .with_body(include_str!("main.js"))
         }
         "/main.css" => {
             response
-                .with_content_type(mime::TEXT_CSS)
+                .with_content_type(mime::TEXT_CSS_UTF_8)
                 .with_body(include_str!("main.css"))
         }
         "/robots.txt" => {
             response
-                .with_content_type(mime::TEXT_PLAIN)
+                .with_content_type(mime::TEXT_PLAIN_UTF_8)
                 .with_body(include_str!("robots.txt"))
         }
         "/.well-known/fastly/demo-manifest" => {
             response
-                .with_content_type(mime::TEXT_PLAIN)
+                .with_content_type(mime::TEXT_PLAIN_UTF_8)
                 .with_body(include_str!("demo-manifest"))
         }
         "/images/screenshot.png" => {
@@ -67,7 +67,7 @@ fn main() -> Result<(), Error> {
         _ => {
             // incl. index.html
             response
-                .with_content_type(mime::TEXT_HTML)
+                .with_content_type(mime::TEXT_HTML_UTF_8)
                 .with_body(include_str!("index.html"))
         }
     };
