@@ -111,13 +111,15 @@ router.post('/api/room/:roomId/question/:questionId/up-vote', async(req, res) =>
 });
 
 // Demo Logging
-const logger = fastly.getLogger('demo_logs');
-
+let _logger: Logger | null = null;
 function logDemo(sessionId: string, msg: string) {
-  logger.log(JSON.stringify({
+  if(_logger == null) {
+    _logger = fastly.getLogger('demo_logs');
+  }
+  _logger.log(JSON.stringify({
     logId: generateId(4),
     session: sessionId,
-    context: "websocket-main",
+    context: "main",
     source: fastly.env.get('FASTLY_HOSTNAME'),
     msg,
   }));
