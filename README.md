@@ -25,34 +25,35 @@ In this example, the origin is also a Compute@Edge app, written in JavaScript.
 
 ## Live Demo
 
-Visit [https://qa-websockets-demo.edgecompute.app/](https://qa-websockets-demo.edgecompute.app/) to see this demo in action.
-
 This demo is a realtime-updating "question and answer" board for a live event, online or offline. Attendees at
 an event join a room and may post questions. The organizer is able to reply to the questions or delete them. The changes
-propagate immediately to all connected participants over WebSocket.
+propagate immediately to all connected participants over WebSockets.
+
+Visit [https://qa-websockets-demo.edgecompute.app/](https://qa-websockets-demo.edgecompute.app/) to see this demo in action.
 
 Try:
 
-* Open the app in two or browser windows at the same time. Or for more fun, give your friend the URL and join together.
+* Open the app URL https://qa-websockets-demo.edgecompute.app/ in two or more browser windows at the same time. Or for
+  more fun, give your friend the URL and join together.
 
-* In each browser window, pick a name, and join a room. Any name can be used as a room. Try `fastly`, `fastlyparty`, or `random`, or pick a name you
-like, and you can create your own. Just make sure everyone joins the same room.
+* In each browser window, pick a name, and join a room. Any name can be used as a room. You can try `fastly`, `fastlyparty`,
+  or `random`. Or pick any name you like, and you can create your own room. Just make sure everyone joins the same room.
 
 * Post a question by typing into the box at the bottom. Moments later it shows up on everybody else's screen.
 
-* Any questions you enter will begin upvoted by you. But go ahead and upvote the questions that were entered by other users.
-Those upvotes will show up in everyone's screens.  And see questions with more votes move to the top. 
+* Any questions you enter will begin with one upvote -- yours. But go ahead and upvote the questions that were entered by other users.
+  Those upvotes will show up in everyone's screens.  And see questions with more votes move to the top.
 
 * The person who created the room, or anyone who checked `join as host` on the entry screen, will see buttons to reply
-to questions. Submit an answer to a question. The answer shows up on everyone else's screen.
+  to questions. Submit an answer to a question. The answer shows up on everyone else's screen.
 
 * If a host thinks a question is inappropriate, they can delete it. The question disappears from everyone's screen right away.
 
 * If you're a host, you can tap the pencil next to the room name to edit the name and color theme of a room. Those changes
-are seen by other users too.
+  are seen by other users too.
 
 * Finally, you can change the way your own name is displayed. Tap the down arrow by your username up top, and enter a new name.
-Everyone will see those changes right away.
+  Everyone will see those changes right away.
 
 ## Structure
 
