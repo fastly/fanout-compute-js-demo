@@ -1,13 +1,37 @@
+use log;
+use rand::Rng;
+use serde_json::json;
 use fastly::experimental::RequestUpgradeWebsocket;
 use fastly::http::{header, Method, StatusCode};
 use fastly::{mime, Error, Request, Response, Body};
 
+fn log_id() -> String {
+    const CHARSET: &[u8] = b"0123456789abcdef";
+    let mut rng = rand::thread_rng();
+    return (0..8)
+        .map(|_| {
+            let idx = rng.gen_range(0..CHARSET.len());
+            CHARSET[idx] as char
+        })
+        .collect();
+}
+
 fn main() -> Result<(), Error> {
 
+    log_fastly::init_simple("demo_logs", log::LevelFilter::Info);
+
     let req = Request::from_client();
+    let session_id = req.get_query_parameter("session");
 
     // Upgrade websocket requests
     if let Some("websocket") = req.get_header_str("Upgrade") {
+        log::info!("{}", json!({
+            "logID": log_id(),
+            "session": session_id,
+            "context": "main",
+            "source": std::env::var("FASTLY_HOSTNAME").unwrap(),
+            "msg": "Upgrading websocket connection",
+        }).to_string());
         return Ok(req.upgrade_websocket("edge_app")?);
     }
 
@@ -66,6 +90,13 @@ fn main() -> Result<(), Error> {
         }
         _ => {
             // incl. index.html
+            log::info!("{}", json!({
+                "logID": log_id(),
+                "session": session_id,
+                "context": "main",
+                "source": std::env::var("FASTLY_HOSTNAME").unwrap(),
+                "msg": "Sending index.html",
+            }).to_string());
             response
                 .with_content_type(mime::TEXT_HTML_UTF_8)
                 .with_body(include_str!("index.html"))
