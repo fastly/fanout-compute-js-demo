@@ -1,33 +1,43 @@
 ---
 schemaVersion: 1
 title: WebSockets at the edge
-id: sse
+id: realtimeqa-websockets
 image:
   href: /images/screenshot.png
   alt: Realtime Q&A
 description: |
-  Use Fanout technology on Compute@Edge to send and receive updates to and from very large audiences in real time, at the edge.
+  Use WebSockets at the edge to engage in bi-directional realtime updates with very large audiences in real time.
 views:
   endUser:
     mode: frame
     href: /
+    height: 550
   behindTheScenes:
     mode: sse
     href: https://developer.fastly.com/logs/demo/demo-websockets-qa
 sessions: true
 ---
 
-## WebSockets
+## WebSockets at the edge
 
-[WebSockets](https://datatracker.ietf.org/doc/html/rfc6455) allows browsers to keep an open data channel with
+[WebSocket](https://datatracker.ietf.org/doc/html/rfc6455) is a mechanism that allows browsers to keep an open data channel with
 a server. This channel can be used to send and receive updates in real time, enhancing the user experience
-with a sense of togetherness with other users.
+with a sense of always-up-to-date freshness, and for multi-user applications, togetherness with other users.
 
-Implementing WebSockets for an application has typically meant that the origin server must hold and maintain
+Implementing WebSocket support for an application has typically meant that the origin server must hold and maintain
 all of these connections.
 
-With Fastly Fanout and the open [WebSocket-Over-HTTP](https://pushpin.org/docs/protocols/websocket-over-http/) protocol,
+With Fastly Fanout and the open [WebSocket-Over-HTTP Protocol](https://pushpin.org/docs/protocols/websocket-over-http/) standard,
 Compute@Edge holds all of these WebSocket connections for you at the edge, so that your origin can focus on business logic.
 
-The origin receives incoming WebSocket messages in the form of HTTP POST requests, and sends messages by making
-its own HTTP requests to a publishing endpoint.
+Once the client application makes a WebSocket connection, the origin subscribes that connection to any number of
+named "channels" (derived from the room name in the above example). Then, when the origin wishes to send data
+over these connections, it does this by making its own HTTP requests to a publishing endpoint, referencing
+that channel name.
+
+The client may also send messages over that connection. Those messages arrive at the origin in the form of
+HTTP POST requests.
+
+In this example, the origin is also a Compute@Edge app written in JavaScript, using the GRIP libraries [js-grip](https://github.com/fanout/js-grip)
+and [js-serve-grip](https://github.com/fanout/js-serve-grip) libraries with the [Expressly](https://github.com/fastly/expressly)
+routing framework.
