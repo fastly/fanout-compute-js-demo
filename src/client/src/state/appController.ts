@@ -9,12 +9,13 @@ export class AppController {
   constructor(
     private dispatch: ActionOrFunctionDispatcher<AppState, AppStateAction>,
     private wsContext: WebSocketContextValue,
+    private sessionId: string,
   ) {}
   isWebsocketConnected() {
     return this.wsContext.getSocket() != null;
   }
   openWs(roomId: string) {
-    this.wsContext.open(WEBSOCKET_URL_BASE + '?roomId=' + roomId);
+    this.wsContext.open(WEBSOCKET_URL_BASE + '?roomId=' + roomId + (this.sessionId !== '' ? '&session=' + this.sessionId : ''));
   }
   closeWs() {
     this.wsContext.close();
