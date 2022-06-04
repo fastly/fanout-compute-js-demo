@@ -5,5 +5,5 @@ authors = ["komuro@fastly.com"]
 description = "Enables Fastly Fanout by upgrading websocket connections and forwarding other requests."
 language = "rust"
 manifest_version = 2
-name = "fanout-fastly"
+name = "demo-frontend"
 service_id = ""
