@@ -48,7 +48,13 @@ function TitleBar(props: TitleBarProps) {
         </div>
       </div>
       <div className="spacer user-name-section">
-        <div className="username">{userInfo != null ? userInfo.displayName : userId}</div>
+        <div className="username"
+             onClick={() => {
+               actions.enterRoomSubUi('edit-user-details', userId, roomInfo);
+             }}
+        >
+          {userInfo != null ? userInfo.displayName : userId}
+        </div>
         <button onClick={() => {
           actions.enterRoomSubUi('edit-user-details', userId, roomInfo);
         }}><span className="material-icons">expand_more</span></button>
