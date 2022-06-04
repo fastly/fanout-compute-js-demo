@@ -367,32 +367,6 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
   res.end('');
 });
 
-router.get('/api/publishtest', async (req, res) => {
-
-  const publisher = serveGrip.getPublisher();
-  await publisher.publishHttpStream('test', 'test\n');
-
-  res.end('OK');
-
-});
-
-router.get('/api/accesstest', async (req, res) => {
-
-  const response = await fetch('https://fanout.fastly.com/', {
-    backend: 'grip-publisher',
-  });
-
-  const resHeaders: Record<string, string> = {};
-  for(const [key, value] of response.headers.entries()) {
-    resHeaders[key] = value;
-  }
-
-  console.log('response', {status: response.status});
-
-  res.end(await response.text());
-
-});
-
 router.get('/', async (req, res) => {
   res.end('OK');
 });
