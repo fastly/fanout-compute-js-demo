@@ -6,7 +6,7 @@ image:
   href: /images/screenshot.png
   alt: Realtime Q&A
 description: |
-  Use WebSockets at the edge to engage in bi-directional realtime updates with very large audiences in real time.
+  Use WebSockets at the edge to engage in bidirectional updates with very large audiences in real time.
 views:
   endUser:
     mode: frame
@@ -14,8 +14,9 @@ views:
     height: 550
   behindTheScenes:
     mode: sse
-    href: https://developer.fastly.com/logs/demo/demo-websockets-qa
+    href: https://developer.fastly.com/logs/demo/demo-websockets-edge
 sessions: true
+repo: https://github.com/fastly/fanout-compute-js-demo
 ---
 
 ## WebSockets at the edge
@@ -32,12 +33,10 @@ Compute@Edge holds all of these WebSocket connections for you at the edge, so th
 
 Once the client application makes a WebSocket connection, the origin subscribes that connection to any number of
 named "channels" (derived from the room name in the above example). Then, when the origin wishes to send data
-over these connections, it does this by making its own HTTP requests to a publishing endpoint, referencing
+over these connections, it does this by making its own HTTP requests to a publishing endpoint and referencing
 that channel name.
 
 The client may also send messages over that connection. Those messages arrive at the origin in the form of
 HTTP POST requests.
 
-In this example, the origin is also a Compute@Edge app written in JavaScript, using the GRIP libraries [js-grip](https://github.com/fanout/js-grip)
-and [js-serve-grip](https://github.com/fanout/js-serve-grip) libraries with the [Expressly](https://github.com/fastly/expressly)
-routing framework.
+In this example, the origin is also a Compute@Edge app, written in JavaScript.

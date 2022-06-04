@@ -2,7 +2,7 @@
 # https://developer.fastly.com/reference/fastly-toml/
 
 authors = ["komuro@fastly.com"]
-description = "Enables Fastly Fanout by upgrading websocket connections and forwarding other requests."
+description = "Serves application static files and forwards other requests to the origin, upgrading applicable connections to WebSocket."
 language = "rust"
 manifest_version = 2
 name = "demo-frontend"
