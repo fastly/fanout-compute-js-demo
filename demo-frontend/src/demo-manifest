@@ -1,0 +1,33 @@
+---
+schemaVersion: 1
+title: WebSockets at the edge
+id: sse
+image:
+  href: /images/screenshot.png
+  alt: Realtime Q&A
+description: |
+  Use Fanout technology on Compute@Edge to send and receive updates to and from very large audiences in real time, at the edge.
+views:
+  endUser:
+    mode: frame
+    href: /
+  behindTheScenes:
+    mode: sse
+    href: https://developer.fastly.com/logs/demo/demo-websockets-qa
+sessions: true
+---
+
+## WebSockets
+
+[WebSockets](https://datatracker.ietf.org/doc/html/rfc6455) allows browsers to keep an open data channel with
+a server. This channel can be used to send and receive updates in real time, enhancing the user experience
+with a sense of togetherness with other users.
+
+Implementing WebSockets for an application has typically meant that the origin server must hold and maintain
+all of these connections.
+
+With Fastly Fanout and the open [WebSocket-Over-HTTP](https://pushpin.org/docs/protocols/websocket-over-http/) protocol,
+Compute@Edge holds all of these WebSocket connections for you at the edge, so that your origin can focus on business logic.
+
+The origin receives incoming WebSocket messages in the form of HTTP POST requests, and sends messages by making
+its own HTTP requests to a publishing endpoint.

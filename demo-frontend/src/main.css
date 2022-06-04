@@ -1,0 +1,755 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  monospace;
+}
+
+div.modal-backdrop {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba( 0, 0, 0, 0.5 );
+}
+
+.App {
+  height: 100vh;
+  max-height: -moz-available;
+  max-height: -webkit-fill-available;
+  max-height: fill-available;
+}
+
+.StartScreen {
+
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.StartScreen > .main-area {
+  width: 100%;
+  height: 90%;
+}
+
+@media only screen and (min-width: 768px) {
+  .StartScreen > .main-area {
+    width: 80%;
+    height: 80%;
+  }
+}
+
+.StartScreen > .main-area > .title {
+
+  font-size: 48px;
+  color: darkblue;
+  text-align: center;
+  margin: 16px 0;
+
+}
+
+.StartScreen > .main-area > .start-form {
+  margin: 32px auto;
+  font-size: 24px;
+
+  width: 80%;
+}
+@media only screen and (min-width: 768px) {
+  .StartScreen > .main-area {
+    width: 50%;
+  }
+}
+
+.StartScreen > .main-area > .start-form .start-message,
+.StartScreen > .main-area > .start-form .submit-button-group {
+  text-align: center;
+}
+
+.StartScreen > .main-area > .start-form .input-group {
+  margin: 32px 0;
+}
+
+.StartScreen > .main-area > .start-form .label-text {
+  font-size: 18px;
+}
+
+.StartScreen > .main-area > .start-form .input-text-field {
+  font-size: 18px;
+  width: 100%;
+  padding: 8px;
+}
+
+.StartScreen > .main-area > .start-form .input-text-field,
+.StartScreen > .main-area > .start-form .input-checkbox-field {
+  cursor: pointer;
+}
+
+.StartScreen > .main-area > .start-form .submit-button-group button {
+  font-size: 24px;
+  border: 1px solid black;
+  border-radius: 10px;
+  background: darkblue;
+  color: white;
+  padding: 4px 16px;
+  cursor: pointer;
+}
+
+.StartScreen > .main-area > .start-form .error-group {
+  font-size: 16px;
+  color: red;
+}
+
+.CreateRoom {
+
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.CreateRoom > .main-area {
+  width: 100%;
+  height: 90%;
+}
+
+@media only screen and (min-width: 768px) {
+  .CreateRoom > .main-area {
+    width: 80%;
+    height: 80%;
+  }
+}
+
+.CreateRoom > .main-area > .title {
+
+  font-size: 48px;
+  color: darkblue;
+  text-align: center;
+  margin: 16px 0;
+
+}
+
+
+.CreateRoom > .main-area > .form {
+  margin: 32px auto;
+  font-size: 20px;
+
+  width: 80%;
+}
+@media only screen and (min-width: 768px) {
+  .CreateRoom > .main-area > .form {
+    width: 60%;
+  }
+}
+
+
+.CreateRoom > .main-area > .form .form-message,
+.CreateRoom > .main-area > .form .submit-button-group {
+  text-align: center;
+}
+
+.CreateRoom > .main-area > .form .input-group {
+  margin: 32px 0;
+}
+
+.CreateRoom > .main-area > .form .label-text {
+  font-size: 18px;
+}
+
+.CreateRoom > .main-area > .form .input-text-field {
+  font-size: 18px;
+  width: 100%;
+  padding: 8px;
+}
+
+.CreateRoom > .main-area > .form .input-text-field,
+.CreateRoom > .main-area > .form .input-checkbox-field {
+  cursor: pointer;
+}
+
+.CreateRoom > .main-area > .form .submit-button-group button {
+  font-size: 24px;
+  border: 1px solid black;
+  border-radius: 10px;
+  background: darkblue;
+  color: white;
+  padding: 4px 16px;
+  cursor: pointer;
+}
+
+.CreateRoom > .main-area > .form .error-group {
+  font-size: 16px;
+  color: red;
+}
+
+.CreateRoom > .main-area > .back-label {
+  text-align: center;
+}
+.CreateRoom > .main-area > .back-label > button {
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  text-decoration: underline;
+  color: darkblue;
+}
+
+.ColorPicker {
+  width: 100%;
+}
+
+.ColorPicker .choices {
+  display: flex;
+  justify-content: space-between;
+}
+.ColorPicker .choices .item {
+  border: 4px solid gray;
+  cursor: pointer;
+}
+.ColorPicker .choices .item.selected {
+  border: 4px solid black;
+}
+
+.Room {
+
+  display: grid;
+  height: 100%;
+
+  grid-template-rows: 50px 1fr;
+
+}
+
+.Room .title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid black;
+}
+.Room .title-bar > .spacer {
+  margin: 0 4px;
+  width: 120px;
+}
+
+.Room .title-bar button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.Room .title-bar .exit-section > .exit-button {
+  display: inline-flex;
+  align-items: center;
+}
+.Room .title-bar .exit-section > .exit-button > .exit-text {
+  font-size: 14px;
+}
+
+.Room .title-bar .room-name-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.Room .title-bar .room-name-section > .spacer {
+  width: 30px;
+  text-align: center;
+}
+.Room .title-bar .room-name-section > .spacer > button > span {
+  font-size: 16px;
+}
+
+.Room .title-bar .user-name-section {
+  display: flex;
+  justify-content: end;
+}
+
+.Room .title-bar .user-name-section > .username {
+  font-size: 14px;
+}
+.Room .title-bar .user-name-section > button > span {
+  font-size: 18px;
+}
+
+@media only screen and (min-width: 767px) {
+  .Room .title-bar > .spacer {
+    width: 220px;
+  }
+  .Room .title-bar .exit-section > .exit-button > .exit-text {
+    font-size: 18px;
+  }
+  .Room .title-bar .room-name-section {
+    font-size: 30px;
+  }
+  .Room .title-bar .room-name-section > .spacer {
+    width: 50px;
+  }
+  .Room .title-bar .room-name-section > .spacer > button > span {
+    font-size: 24px;
+  }
+  .Room .title-bar .user-name-section > .username {
+    font-size: 22px;
+  }
+  .Room .title-bar .user-name-section > button > span {
+    font-size: 24px;
+  }
+}
+
+
+.QuestionsPanel {
+  max-width: 720px;
+  height: 100%;
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-rows: 1fr 140px;
+
+  position: relative;
+}
+
+.QuestionItem {
+  position: relative;
+
+  border: 1px solid black;
+  margin: 6px 6px;
+  padding: 6px;
+  border-radius: 4px;
+
+  display: flex;
+}
+.QuestionItem .body {
+  flex-grow: 1;
+  font-size: 16px;
+}
+.QuestionItem .question-info {
+  font-size: 14px;
+  font-style: italic;
+  margin-left: 2em;
+}
+.QuestionItem .question-user {
+  font-weight: bold;
+}
+.QuestionItem .answered-text-area {
+  font-size: 14px;
+  margin: 8px 0;
+}
+.QuestionItem .answered-heading {
+  font-weight: bold;
+}
+.QuestionItem .answered-text-section {
+  font-style: italic;
+  padding-left: 2em;
+}
+
+.QuestionItem .margin {
+  flex-grow: 0;
+  width: 65px;
+}
+
+.QuestionItem .margin > .upvote {
+  text-align: right;
+  margin-top: 20px;
+}
+.QuestionItem .margin > .upvote > button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+.QuestionItem .margin > .upvote > button.upvote-button {
+  display: inline-flex;
+  border-radius: 8px;
+  align-items: center;
+  padding: 1px 4px;
+}
+.QuestionItem .margin > .upvote > button.upvote-button > .count {
+  font-size: 12px;
+  padding-right: 4px;
+  text-align: left;
+}
+.QuestionItem .margin > .upvote > button.upvote-button > .thumbs-up-icon {
+  font-size: 12px;
+}
+.QuestionItem.selfUpVoted .margin > .upvote > button.upvote-button {
+  color: white;
+  font-weight: bold;
+}
+
+.QuestionItem .margin > .actions {
+  display: flex;
+  justify-content: end;
+  margin: 4px 0;
+}
+
+.QuestionItem .margin > .actions button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  margin: 0 2px;
+}
+.QuestionItem .margin > .actions button > .material-icons {
+  font-size: 20px;
+}
+
+
+.QuestionItem > .status {
+  font-size: 10px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 2px 6px;
+}
+
+.QuestionItem.answered .status {
+  color: white;
+  font-weight: bold;
+}
+
+.QuestionEntry {
+  display: grid;
+  grid-template-rows: 24px 1fr 32px;
+  padding: 0 4px;
+}
+
+.QuestionEntry > .question-entryarea {
+  padding: 4px 0;
+}
+
+.QuestionEntry > .question-entryarea > .textentry {
+  height: 100%;
+  width: 100%;
+}
+
+.QuestionEntry > .question-buttonarea {
+  text-align: center;
+}
+
+.QuestionEntry > .question-buttonarea > .question-submit {
+  font-size: 16px;
+  border-radius: 16px;
+  background: white;
+  border: 1px solid white;
+  cursor: pointer;
+}
+
+.QuestionPrompt {
+  position: absolute;
+  width: 100%;
+  top: 5%;
+  left: 0;
+  text-align: center;
+  font-size: 18px;
+}
+
+.DeleteQuestion {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  transform: translate(-50%, -30%);
+
+  width: 500px;
+  background: white;
+
+  padding: 8px;
+}
+
+.DeleteQuestion h1 {
+  margin: 0;
+}
+
+.DeleteQuestion .question-text-area,
+.DeleteQuestion .answered-text-area,
+.DeleteQuestion .upvotes-area,
+.DeleteQuestion .buttons-area {
+  padding: 16px;
+}
+
+.DeleteQuestion .buttons-area {
+  text-align: center;
+}
+
+.DeleteQuestion .buttons-area > button {
+  border-radius: 12px;
+  font-size: 16px;
+  padding: 4px 8px;
+  color: white;
+  cursor: pointer;
+}
+
+.AnswerQuestion {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  transform: translate(-50%, -30%);
+
+  width: 500px;
+  background: white;
+
+  padding: 8px;
+}
+
+.AnswerQuestion h1 {
+  margin: 0;
+}
+
+.AnswerQuestion .question-text-area,
+.AnswerQuestion .answer-area,
+.AnswerQuestion .upvotes-area,
+.AnswerQuestion .buttons-area {
+  padding: 16px;
+}
+
+.AnswerQuestion .answer-area {
+  height: 80px;
+}
+.AnswerQuestion .answer-area .textentry {
+  height: 100%;
+  width: 100%;
+}
+
+.AnswerQuestion .buttons-area {
+  text-align: center;
+}
+
+.AnswerQuestion .buttons-area > button {
+  border-radius: 12px;
+  font-size: 16px;
+  padding: 4px 8px;
+  color: white;
+  cursor: pointer;
+}
+
+.EditUserDetails {
+  position: absolute;
+  top: 50px;
+  right: 8px;
+
+  width: 500px;
+  max-width: calc( 100% - 16px );
+  background: white;
+
+  padding: 8px;
+}
+
+.EditUserDetails h1 {
+  margin: 0;
+}
+
+.EditUserDetails .input-group,
+.EditUserDetails .buttons-area {
+  padding: 16px;
+}
+
+.EditUserDetails .input-group .label-text {
+  font-size: 18px;
+}
+
+.EditUserDetails .input-group .input-text-field {
+  font-size: 18px;
+  width: 100%;
+  padding: 8px;
+  cursor: pointer;
+}
+
+
+.EditUserDetails .buttons-area {
+  text-align: center;
+}
+
+.EditUserDetails .buttons-area > button {
+  border-radius: 12px;
+  font-size: 16px;
+  padding: 4px 8px;
+  color: white;
+  cursor: pointer;
+}
+
+.EditRoomDetails {
+  position: absolute;
+  left: 50%;
+  top: 50px;
+  transform: translate(-50%, 0);
+
+  width: 500px;
+  max-width: calc( 100% - 16px );
+  background: white;
+
+  padding: 8px;
+}
+
+.EditRoomDetails h1 {
+  margin: 0;
+}
+
+.EditRoomDetails .input-group,
+.EditRoomDetails .buttons-area {
+  padding: 16px;
+}
+
+.EditRoomDetails .input-group .label-text {
+  font-size: 18px;
+}
+
+.EditRoomDetails .input-group .input-text-field {
+  font-size: 18px;
+  width: 100%;
+  padding: 8px;
+  cursor: pointer;
+}
+
+
+.EditRoomDetails .buttons-area {
+  text-align: center;
+}
+
+.EditRoomDetails .buttons-area > button {
+  border-radius: 12px;
+  font-size: 16px;
+  padding: 4px 8px;
+  color: white;
+  cursor: pointer;
+}
+
+.TestMode {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  width: calc( 100% - 20px );
+  height: calc( 100% - 20px );
+  background-color: white;
+  border: gray 1px solid;
+
+  display: grid;
+  grid-gap: 0;
+  grid-template-rows: 50px calc( 100% - 50px );
+}
+
+.TestMode > .title {
+  padding: 0 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.TestMode > .title > h1 {
+  margin: 0;
+}
+
+.TestMode > .title > .pager {
+  display: flex;
+  align-items: center;
+}
+.TestMode > .title > .pager > button {
+  width: 44px;
+  height: 44px;
+  font-size: 36px;
+  cursor: pointer;
+}
+.TestMode > .title > .pager > .number {
+  width: 40px;
+  text-align: center;
+  font-size: 36px;
+}
+
+@media only screen and (min-width: 768px) {
+  .TestMode > .title > .pager {
+    display: none;
+  }
+}
+
+.TestMode > .panels {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  grid-gap: 0;
+  grid-template-rows: 50% 50%;
+  grid-template-columns: 50% 50%;
+  min-width: 0;
+}
+
+@media only screen and (max-width: 767px) {
+  .TestMode > .panels {
+    display: block;
+  }
+
+  .TestMode > .panels.active-page-0 > div:nth-child(2),
+  .TestMode > .panels.active-page-0 > div:nth-child(3),
+  .TestMode > .panels.active-page-0 > div:nth-child(4),
+  .TestMode > .panels.active-page-1 > div:nth-child(1),
+  .TestMode > .panels.active-page-1 > div:nth-child(3),
+  .TestMode > .panels.active-page-1 > div:nth-child(4),
+  .TestMode > .panels.active-page-2 > div:nth-child(1),
+  .TestMode > .panels.active-page-2 > div:nth-child(2),
+  .TestMode > .panels.active-page-2 > div:nth-child(4),
+  .TestMode > .panels.active-page-3 > div:nth-child(1),
+  .TestMode > .panels.active-page-3 > div:nth-child(2),
+  .TestMode > .panels.active-page-3 > div:nth-child(3) {
+    display: none;
+  }
+}
+
+.TestMode > .panels > div {
+  width: 100%;
+  height: 100%;
+  padding: 4px 10px;
+  overflow: scroll;
+}
+
+.AppState pre {
+  background-color: lightgray;
+  padding: 4px;
+  overflow: auto;
+}
+
+.TestActions {
+  background-color: #ddd;
+}
+
+.WebSocketsLog {
+  background-color: #eee;
+}
+
+.TestOperation {
+  border: 1px solid black;
+  margin: 4px 0;
+  padding: 4px;
+}
+
+.TestOperation--result {
+  border: 1px solid black;
+  margin: 4px 0;
+  padding: 4px;
+}
+.TestOperation--result pre {
+  background-color: lightgray;
+  padding: 4px;
+}
+.TestOperation--result--header {
+  display: flex;
+}
+
+.TestModeButton {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+.TestModeButton > button {
+  height: 44px;
+  width: 88px;
+  cursor: pointer;
+}
+
