@@ -463,6 +463,8 @@ div.modal-backdrop {
   background: white;
 
   padding: 8px;
+
+  max-width: calc(100% - 16px);
 }
 
 .DeleteQuestion h1 {
@@ -498,6 +500,8 @@ div.modal-backdrop {
   background: white;
 
   padding: 8px;
+
+  max-width: calc(100% - 16px);
 }
 
 .AnswerQuestion h1 {
@@ -742,7 +746,7 @@ div.modal-backdrop {
 }
 
 .TestModeButton {
-  position: absolute;
+  position: fixed;
   bottom: 10px;
   right: 10px;
 }
