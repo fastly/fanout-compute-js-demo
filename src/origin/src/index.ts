@@ -6,7 +6,7 @@ import { EResponse, Router } from "@fastly/expressly";
 import { GripExpresslyRequest, GripExpresslyResponse, ServeGrip } from "@fastly/serve-grip-expressly";
 import { createWebSocketControlMessage, WebSocketMessageFormat } from "@fanoutio/grip";
 import { AlreadyExistsError, HttpError, NotFoundError, Persistence } from "./services/Persistence";
-import { UserInfo } from "../../data/src";
+import { generateId, UserInfo } from "../../data/src";
 import { GRIP_URL } from "./env";
 
 const serveGrip = new ServeGrip({
@@ -110,6 +110,19 @@ router.post('/api/room/:roomId/question/:questionId/up-vote', async(req, res) =>
   await processAndSendJsonResult(res, async () => await instance.upVoteQuestion(req.params.roomId, body.userId, req.params.questionId, body.removeUpvote));
 });
 
+// Demo Logging
+const logger = fastly.getLogger('demo_logs');
+
+function logDemo(sessionId: string, msg: string) {
+  logger.log(JSON.stringify({
+    logId: generateId(4),
+    session: sessionId,
+    context: "websocket-main",
+    source: fastly.env.get('FASTLY_HOSTNAME'),
+    msg,
+  }));
+}
+
 // Websocket-over-HTTP is translated to HTTP POST
 router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpresslyResponse) => {
 
@@ -130,21 +143,21 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
     return;
   }
 
-  console.log('incoming ', wsContext.id);
+  const sessionId = req.query.get('session');
+
+  console.log('incoming ', wsContext.id, sessionId);
+  logDemo(sessionId, 'Received incoming connection ' + wsContext.id);
 
   // If this is a new connection, accept it and subscribe it to a channel
   if (wsContext.isOpening()) {
     console.log('is opening');
+    logDemo(sessionId, 'Websocket Opening');
     wsContext.accept();
     wsContext.subscribe('room-' + roomId);
     wsContext.sendControl(createWebSocketControlMessage('keep-alive', { content: '{}', timeout: 20 }))
+    logDemo(sessionId, 'Subscribing the socket to channel [room-' + roomId + ']');
     try {
       await instance.addSub('room-' + roomId, wsContext.id);
-    } catch {
-    }
-    wsContext.subscribe('rooms');
-    try {
-      await instance.addSub('room', wsContext.id);
     } catch {
     }
   }
@@ -159,11 +172,13 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
       message = wsContext.recv();
     } catch(ex) {
       console.log('client disconnected');
+      logDemo(sessionId, 'Detected disconnection');
       message = null;
     }
 
     if (message == null) {
       console.log('client closed');
+      logDemo(sessionId, 'Closing the socket');
       // If return value is undefined then connection is closed
       wsContext.close();
       try {
@@ -183,12 +198,15 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
       continue;
     }
 
+    logDemo(sessionId, 'Message: ' + JSON.stringify(messageContent));
+
     switch(messageContent.type) {
     case 'ROOMINFO_UPDATE': {
       const { roomId, roomData } = messageContent;
       console.log('Update Room Info', messageContent);
 
       // Save to backing store
+      logDemo(sessionId, 'Updating room info: ' + JSON.stringify({roomId, roomData}));
       const roomInfo = await instance.updateRoomInfo(roomId, roomData);
 
       // Broadcast it
@@ -197,6 +215,7 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
         roomInfo,
       };
       console.log('Broadcasting', message);
+      logDemo(sessionId, 'Queueing message to [room-' + roomId + ']: ' + JSON.stringify(message));
       messagesToPublish.push({
         channel: 'room-' + roomId,
         messageFormat: new WebSocketMessageFormat(JSON.stringify(message)),
@@ -209,6 +228,7 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
       console.log('Update User Info', messageContent);
 
       // Save to backing store
+      logDemo(sessionId, 'Updating user info: ' + JSON.stringify({userId, userData}));
       const userInfo = await instance.updateUserInfo(userId, userData);
 
       // Broadcast it
@@ -217,6 +237,7 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
         userInfo,
       };
       console.log('Broadcasting', message);
+      logDemo(sessionId, 'Queueing message to [room-' + roomId + ']: ' + JSON.stringify(message));
       messagesToPublish.push({
         channel: 'room-' + roomId,
         messageFormat: new WebSocketMessageFormat(JSON.stringify(message)),
@@ -229,6 +250,7 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
       console.log('Post Question', messageContent);
 
       // Save to backing store
+      logDemo(sessionId, 'Posting Question: ' + JSON.stringify({roomId, userId, questionId, questionText}));
       const questionInfo = await instance.addQuestionToRoom(roomId, userId, questionId, questionText);
 
       let userInfo: UserInfo = null;
@@ -251,6 +273,7 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
         userInfo,
       };
       console.log('Broadcasting', message);
+      logDemo(sessionId, 'Queueing message to [room-' + roomId + ']: ' + JSON.stringify(message));
       messagesToPublish.push({
         channel: 'room-' + roomId,
         messageFormat: new WebSocketMessageFormat(JSON.stringify(message)),
@@ -262,12 +285,15 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
       const { roomId, questionId, answerAuthor, answerText } = messageContent;
       console.log('Answer Question', messageContent);
 
-      // Save to backing store
-      const questionInfo = await instance.updateQuestion(roomId, questionId, {
+      const questionData = {
         answerAuthor,
         answerText,
         answerTimestamp: new Date(),
-      });
+      };
+
+      // Save to backing store
+      logDemo(sessionId, 'Posting Answer: ' + JSON.stringify({roomId, questionId, questionData}));
+      const questionInfo = await instance.updateQuestion(roomId, questionId, questionData);
 
       let userInfo: UserInfo = null;
       try {
@@ -288,6 +314,7 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
         userInfo,
       };
       console.log('Broadcasting', message);
+      logDemo(sessionId, 'Queueing message to [room-' + roomId + ']: ' + JSON.stringify(message));
       messagesToPublish.push({
         channel: 'room-' + roomId,
         messageFormat: new WebSocketMessageFormat(JSON.stringify(message)),
@@ -301,16 +328,17 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
       console.log('Delete Question', messageContent);
 
       // Save to backing store
+      logDemo(sessionId, 'Deleting question: ' + JSON.stringify({roomId, questionId}));
       await instance.deleteQuestion(roomId, questionId);
 
       // Send to everyone in room
-      // Publishing to websockets
       const message = {
         type: 'QUESTION_DELETE_PASSIVE',
         roomId,
         questionId,
       };
       console.log('Broadcasting', message);
+      logDemo(sessionId, 'Queueing message to [room-' + roomId + ']: ' + JSON.stringify(message));
       messagesToPublish.push({
         channel: 'room-' + roomId,
         messageFormat: new WebSocketMessageFormat(JSON.stringify(message)),
@@ -323,6 +351,7 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
       console.log('Upvote Question', messageContent);
 
       // Save to backing store
+      logDemo(sessionId, 'Upvoting question: ' + JSON.stringify({roomId, userId, questionId, removeUpvote}));
       const questionInfo = await instance.upVoteQuestion(roomId, userId, questionId, removeUpvote);
 
       let userInfo: UserInfo = null;
@@ -335,7 +364,6 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
       }
 
       // Get updated data and send to everyone in room
-      // Publishing to websockets
       const message = {
         type: 'QUESTION_UPVOTE_PASSIVE',
         roomId,
@@ -344,6 +372,7 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
         userInfo,
       };
       console.log('Broadcasting', message);
+      logDemo(sessionId, 'Queueing message to [room-' + roomId + ']: ' + JSON.stringify(message));
       messagesToPublish.push({
         channel: 'room-' + roomId,
         messageFormat: new WebSocketMessageFormat(JSON.stringify(message)),
@@ -355,12 +384,14 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
   }
 
   if(messagesToPublish.length > 0) {
+    logDemo(sessionId, 'Publishing ' + messagesToPublish.length + ' message(s)');
     const publisher = serveGrip.getPublisher();
     for(const messageToPublish of messagesToPublish) {
       const { channel, messageFormat } = messageToPublish;
       await publisher.publishFormats(channel, messageFormat);
     }
-
+  } else {
+    logDemo(sessionId, 'No messages queued');
   }
 
   res.setHeader('Keep-Alive-Interval', '20');
