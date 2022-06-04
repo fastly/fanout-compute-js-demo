@@ -6,4 +6,4 @@ description = "Enables Fastly Fanout by upgrading websocket connections and forw
 language = "rust"
 manifest_version = 2
 name = "fanout-fastly"
-service_id = "3Ix1lNPoA4xFM6rTD0Wrpv"
+service_id = ""
