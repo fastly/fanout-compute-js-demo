@@ -6,11 +6,11 @@
         "@fastly/js-compute": "^0.2.4"
     },
     "devDependencies": {
-        "@fanoutio/grip": "link:../libs/js-grip",
-        "@fanoutio/serve-grip": "link:../libs/js-serve-grip",
-        "@fastly/expressly": "link:../libs/expressly",
-        "@fastly/grip-compute-js": "link:../libs/js-grip-compute-js",
-        "@fastly/serve-grip-expressly": "link:../libs/js-serve-grip-expressly",
+        "@fanoutio/grip": "link:../../libs/js-grip",
+        "@fanoutio/serve-grip": "link:../../libs/js-serve-grip",
+        "@fastly/expressly": "link:../../libs/expressly",
+        "@fastly/grip-compute-js": "link:../../libs/js-grip-compute-js",
+        "@fastly/serve-grip-expressly": "link:../../libs/js-serve-grip-expressly",
         "buffer": "^6.0.3",
         "core-js": "^3.19.1",
         "crypto-browserify": "^3.12.0",
