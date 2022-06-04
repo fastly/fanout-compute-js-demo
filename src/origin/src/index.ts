@@ -6,7 +6,7 @@ import { EResponse, Router } from "@fastly/expressly";
 import { GripExpresslyRequest, GripExpresslyResponse, ServeGrip } from "@fastly/serve-grip-expressly";
 import { createWebSocketControlMessage, WebSocketMessageFormat } from "@fanoutio/grip";
 import { AlreadyExistsError, HttpError, NotFoundError, Persistence } from "./services/Persistence";
-import { generateId, UserInfo } from "../../data/src";
+import { generateId, UserInfo } from "../../data";
 import { GRIP_URL } from "./env";
 
 const serveGrip = new ServeGrip({
