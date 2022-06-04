@@ -1,5 +1,5 @@
 {
-    "name": "edge",
+    "name": "origin",
     "private": true,
     "author": "oss@fastly.com",
     "dependencies": {

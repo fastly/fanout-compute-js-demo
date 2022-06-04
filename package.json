@@ -14,7 +14,7 @@
     "build-apps": "yarn build-apps:persistence && yarn build-apps:client && yarn build-apps:edge",
     "build-apps:persistence": "cd src/persistence && yarn --check-files && yarn build",
     "build-apps:client": "cd src/client && yarn --check-files && yarn build",
-    "build-apps:edge": "cd src/edge && .yarn --check-files && yarn build",
+    "build-apps:edge": "cd src/origin && .yarn --check-files && yarn build",
     "build-apps:demo-frontend": "cd src/demo-frontend && fastly compute build",
     "start": "cd persistence && npm run dev"
   }

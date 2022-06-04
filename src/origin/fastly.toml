@@ -5,7 +5,7 @@ authors = ["komuro@fastly.com"]
 description = "An empty application template for the Fastly Compute@Edge environment which simply returns a 200 OK response."
 language = "javascript"
 manifest_version = 2
-name = "edge"
+name = "origin"
 service_id = ""
 
 [local_server]
