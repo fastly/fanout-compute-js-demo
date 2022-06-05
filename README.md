@@ -211,6 +211,14 @@ browser window through the WebSocket to Fastly. `origin` handles the request, at
 to the publisher endpoint. In any case, all messaging takes place between the browser and Fastly, and then from Fastly to
 the many other browsers connected to Fastly.
 
+## Running the Demo Locally
+
+In order to run the demo locally, you will need to replace the functionality of `demo-frontend` with the open-source
+[Pushpin server](https://pushping.org). The [/pushpin](./pushpin) directory contains files that will help you to run
+Pushpin.
+
+TODO: More details here.
+
 ## Issues
 
 If you encounter any non-security-related bug or unexpected behavior, please [file an issue][bug]
