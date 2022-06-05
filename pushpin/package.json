@@ -6,7 +6,6 @@
   "private": true,
   "scripts": {
     "pull": "docker pull fanout/pushpin",
-    "start": "docker run -d --platform linux/amd64 -p 7999:7999 -p 5560-5563:5560-5563 -v $INIT_CWD/config:/etc/pushpin/ --rm --name pushpin fanout/pushpin",
-    "stop": "docker stop pushpin"
+    "start": "docker run --platform linux/amd64 -p 7999:7999 -p 5560-5563:5560-5563 -v $INIT_CWD/config:/etc/pushpin/ --rm --name pushpin fanout/pushpin"
   }
 }
