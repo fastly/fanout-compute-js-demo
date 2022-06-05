@@ -66,25 +66,91 @@ This app comprises four components:
 | /src[/origin](/src/origin)               | `origin`        | Handles API requests for the application, including a handler for WebSockets, running on Compute@Edge. Written in TypeScript.                                                                                                                                                             |
 | /src[/persistence](/src/persistence)     | `persistence`   | An in-memory store of the data used by the application. Written in TypeScript, and should be run on a Node.js server.                                                                                                                                                                     |
 
+## How it works
+
 When the visitor first opens `demo-frontend` in their browser, the static files that make up the `client` app are downloaded,
-and the visitor interacts with the app. The `client` app is written as a React app that opens a WebSocket connection to the
+and the visitor can interact with the app. The `client` app is written as a React app that opens a WebSocket connection to the
 `/api/websocket?roomId=<roomname>` endpoint on `demo-frontend`. Once the user is in a room, interactions with the app are
 sent over the WebSocket.
 
-`demo-frontend` is a Compute@Edge app (written in Rust) that forwards API requests to `origin`. Importantly, when a client
-sends a request to open a WebSocket, that request is 'upgraded' by the `upgrade_websocket` as it is forwarded.
+`demo-frontend` is a Compute@Edge app (written in Rust) that forwards API requests to `origin`.
+
+```mermaid
+sequenceDiagram
+    participant browser
+    participant demo_frontend as demo-frontend
+    participant origin
+    rect rgba(127, 127, 127, .1)
+      browser->>demo_frontend: request
+      demo_frontend->>origin: forward request (HTTP)
+      origin->>demo_frontend: HTTP response
+      demo_frontend->>browser: forward response
+      Note over browser, origin: HTTP API requests
+    end
+```
+
+When a client sends a request to open a WebSocket, that request is 'upgraded' by the `upgrade_websocket` as it is forwarded.
 After this upgrade, Fastly Fanout will hold and continue to hold the WebSocket connection with the client. Moreover, it will
 translate any WebSocket messages into HTTP, via the [WebSocket-Over-HTTP Protocol](https://pushpin.org/docs/protocols/websocket-over-http/).
 Therefore, together with the other REST API calls that are forwarded, all API calls are HTTP requests by the time they reach
 `origin`.
 
+```mermaid
+sequenceDiagram
+    participant browser
+    participant demo_frontend as demo-frontend
+    participant origin
+    rect rgba(127, 127, 127, .1)
+      browser->>demo_frontend: new WebSocket()
+      Note right of demo_frontend: Connection is upgraded to WebSocket
+      demo_frontend->>origin: send OPEN message as HTTP request
+      origin->>demo_frontend: accept connection, subscribe to channels
+      Note left of origin: sent as GRIP headers in HTTP response
+      Note over browser, origin: Browser opening a WebSocket
+    end
+    rect rgba(127, 127, 127, .1)
+        browser->>demo_frontend: ws.send()
+        demo_frontend->>origin: forward request as HTTP request
+        Note right of demo_frontend: request is sent to the same endpoint and includes the same connection-id
+        opt
+            origin->>demo_frontend: response messages, if any
+            Note left of origin: sent as HTTP response using WebSocket-over-HTTP protocol
+            demo_frontend->>browser: forward messages over WebSocket
+            Note over browser, origin: If there is a response specifically for this connection (rare)
+        end
+        Note over browser, origin: Browser sending messages over WebSocket
+    end
+    rect rgba(127, 127, 127, .1)
+      browser->>demo_frontend: ws.close()
+      demo_frontend->>origin: send CLOSE request as HTTP request
+      Note over browser, origin: Browser closing WebSocket
+    end
+```
+
 `origin` is written as a Compute@Edge app in JavaScript. This app uses Fastly's [Expressly](https://github.com/fastly/expressly)
 for routing, and `js-serve-grip-expressly` as a middleware library to work with [GRIP](https://pushpin.org/docs/protocols/grip/),
-the protocol used by Fastly Fanout for realtime. This middle is able to discern whether an incoming request has
+the protocol used by Fastly Fanout for realtime. This middleware is able to discern whether an incoming request has
 come through Fastly and has been upgraded. And if so, it parses relevant headers and WebSocket messages into objects
 that are easy to interact with.
 
-The `POST /api/websocket` route is central, as it handles all WebSocket activity. Keep in mind that this route is called
+```mermaid
+flowchart TD
+  subgraph Middleware
+    B2{Request <br> through Fastly?} -->|Yes| B2a[Process HTTP request headers]
+    B2a --> B3[Build req.grip]
+    B3 --> H
+    B2 -->|No| H
+    H --> B4[Convert state of req.grip.wsContext <br> to HTTP response headers]
+  end
+  subgraph H[Route Handlers in origin Expressly app]
+    C1[Start] --> C2[Work with req.grip.wsContext]
+    C2 --> C3[End]
+  end
+  A[Request at origin] --> Middleware
+  Middleware --> D[Return response from origin]
+```
+
+The `POST /api/websocket` route is central, as it handles all WebSocket activity. It's important to note that this route is called
 once for every activity that comes in over that WebSocket over its lifetime between a single browser window and Fastly,
 including connecting and disconnecting, as well as the individual messages sent from the client. In this app, this route
 handler handles a new connection by registering it with a channel name, and then iterating any incoming WebSocket messages
@@ -92,12 +158,56 @@ to individually process them. Some of this processing will, in turn, result in a
 clients. For this purpose, it uses the underlying GRIP mechanism to post a message, tagged with the channel name, to a
 publishing endpoint (identified by a GRIP_URL).
 
+```mermaid
+flowchart TD
+  subgraph Handler["Handler /api/websocket"]
+    A[Start] --> B{req.grip.wsContext <br> available?}
+    B -->|No| B1[400 error]
+    B1 --> Z[End]
+    B -->|Yes| C{connection<br>is opening?}
+    C -->|Yes| C1[Accept the connection]
+    C1 --> C2[Subscribe connection to room's channel]
+    C2 --> D
+    C -->|No| D
+    D[Create outgoing message queue] --> IM
+    subgraph IM[Incoming Messages]
+      direction TB
+      IM0[examine req.grip.wsContext] -->IMA
+      IMA{incoming<br> messages <br>present?} ------->|No| IMZ[End]
+      IMA -->|Yes| IMA1[pull item from queue]
+      IMA1 -->IMB{Is disconnect<br>message?}
+      IMB -->|Yes| IMB1[Close Socket]
+      IMB1 --> IMZ
+      IMB -->|No| IMC[Process message]
+      IMC --> IMD[Save changes to store]
+      IMD --> IME[Enqueue outgoing message as WebSocketMessageFormat]
+      IME --> IMA
+    end
+    IM --> OM
+    subgraph OM[Outgoing Messages]
+      direction TB
+      OM0[examine outgoing message queue] -->OMA
+      OMA{outgoing<br>messages<br>present?} -->|Yes| OMB
+      OMB[pull item from queue] --> OMB1
+      OMB1["Use serveGrip.getPublisher().publishFormats() to publish message"] -->OMA
+      OMA --->|No| OMZ[End]
+    end
+    OM --> Z[End]
+  end
+```
+
 Sending to the publishing endpoint will cause Fastly to propagate this message to all `client` instances connected and
 listening on that channel. The `client` now handles the WebSocket message received from the server, by updating local
-state and UI. 
+state and UI.
 
-These WebSocket connections are not peer-to-peer, although it may feel that way at times. When realtime activity occurs,
+Publishing messages to the publisher is not limited to during the process of a WebSocket message, though the `origin` program
+in this application does not perform them outside this process. In fact, any application that knows your publisher
+secret may publish messages at any time. Because the `GRIP_URL` encodes this secret, you need to keep it safe and treat it
+as you would any other access token.
+
+Keep in mind these WebSocket connections are not peer-to-peer, but rather server-client. When realtime activity occurs,
 such as when a visitor submits a question, or when the host submits an answer, the messages travels from that user's
 browser window through the WebSocket to Fastly. `origin` handles the request, at the edge, sometimes issuing a message
 to the publisher endpoint. In any case, all messaging takes place between the browser and Fastly, and then from Fastly to
 the many other browsers connected to Fastly.
+
