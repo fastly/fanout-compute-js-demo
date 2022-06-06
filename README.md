@@ -200,8 +200,8 @@ Sending to the publishing endpoint will cause Fastly to propagate this message t
 listening on that channel. The `client` now handles the WebSocket message received from the server, by updating local
 state and UI.
 
-Publishing messages to the publisher is not limited to during the process of a WebSocket message, though the `origin` program
-in this application does not perform them outside this process. In fact, any application that knows your publisher
+Publishing messages is not limited to during the processing of a WebSocket message. Although the `origin` program
+in this example application does not perform them outside this process, any application that knows the publisher
 secret may publish messages at any time. Because the `GRIP_URL` encodes this secret, you need to keep it safe and treat it
 as you would any other access token.
 
@@ -209,7 +209,7 @@ Keep in mind these WebSocket connections are not peer-to-peer, but rather server
 such as when a visitor submits a question, or when the host submits an answer, the messages travels from that user's
 browser window through the WebSocket to Fastly. `origin` handles the request, at the edge, sometimes issuing a message
 to the publisher endpoint. In any case, all messaging takes place between the browser and Fastly, and then from Fastly to
-the many other browsers connected to Fastly.
+the many other browsers whose WebSocket connections are held by Fastly.
 
 ## Running the Demo Locally
 
