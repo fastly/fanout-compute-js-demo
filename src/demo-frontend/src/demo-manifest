@@ -14,7 +14,7 @@ views:
     height: 550
   behindTheScenes:
     mode: sse
-    href: https://developer.fastly.com/logs/demo/demo-websockets-edge
+    href: https://log-bin-dot-rd---product.uc.r.appspot.com/demo-websockets-edge
 sessions: true
 repo: https://github.com/fastly/fanout-compute-js-demo
 ---
