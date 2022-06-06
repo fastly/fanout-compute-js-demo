@@ -2,15 +2,16 @@
     "name": "origin",
     "private": true,
     "author": "oss@fastly.com",
+    "packageManager": "pnpm@7.1.9",
     "dependencies": {
         "@fastly/js-compute": "^0.2.4"
     },
     "devDependencies": {
-        "@fanoutio/grip": "link:../../libs/js-grip",
-        "@fanoutio/serve-grip": "link:../../libs/js-serve-grip",
-        "@fastly/expressly": "link:../../libs/expressly",
-        "@fastly/grip-compute-js": "link:../../libs/js-grip-compute-js",
-        "@fastly/serve-grip-expressly": "link:../../libs/js-serve-grip-expressly",
+        "@fanoutio/grip": "^3.1.0",
+        "@fanoutio/serve-grip": "^1.2.0",
+        "@fastly/expressly": "^1.0.0-alpha.1",
+        "@fastly/grip-compute-js": "^0.1.0",
+        "@fastly/serve-grip-expressly": "^0.1.0",
         "buffer": "^6.0.3",
         "core-js": "^3.19.1",
         "crypto-browserify": "^3.12.0",
@@ -30,7 +31,7 @@
     "scripts": {
         "dev": "tsc && fastly compute serve --addr=\"127.0.0.1:8000\"",
         "build": "tsc && js-compute-runtime --skip-pkg bin/index.js bin/main.wasm",
-        "deploy": "npm run build && fastly compute deploy",
+        "deploy": "pnpm build && fastly compute deploy",
         "prebuild": "webpack"
     },
     "version": "0.2.1"

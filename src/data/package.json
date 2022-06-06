@@ -3,6 +3,7 @@
   "private": true,
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
+  "packageManager": "pnpm@7.1.9",
   "devDependencies": {
     "typescript": "^4.7.2"
   }

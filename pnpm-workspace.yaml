@@ -1,0 +1,6 @@
+packages:
+  # all packages in subdirs of src/ and libs/
+  - 'src/**'
+  - 'libs/**'
+  # exclude packages that are inside test directories
+  - '!**/test/**'

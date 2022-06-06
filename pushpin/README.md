@@ -8,7 +8,7 @@ suitably configured for use with the Fanout WebSockets Compute@Edge Demo.
 Make sure you're running Docker Desktop.
 
 ```shell
-yarn pull
+pnpm pull
 ```
 
 This will obtain the newest release of Pushpin.
@@ -18,7 +18,7 @@ This will obtain the newest release of Pushpin.
 Make sure that local ports 5560-5563 and 7999 are free. Then type the following:
 
 ```shell
-yarn start
+pnpm start
 ```
 
 Pushpin will run, and its logs will be printed to stdout.
