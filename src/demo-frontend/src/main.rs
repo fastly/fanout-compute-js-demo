@@ -28,7 +28,7 @@ fn main() -> Result<(), Error> {
         log::info!("{}", json!({
             "logID": log_id(),
             "session": session_id,
-            "context": "main",
+            "context": "edge",
             "source": std::env::var("FASTLY_HOSTNAME").unwrap(),
             "msg": "Upgrading websocket connection",
         }).to_string());
