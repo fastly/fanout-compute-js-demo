@@ -16,6 +16,16 @@ fn log_id() -> String {
         .collect();
 }
 
+fn log_demo(session_id: Option<&str>, msg: &str) {
+    log::info!("{}", json!({
+        "logID": log_id(),
+        "session": session_id,
+        "context": "edge",
+        "source": std::env::var("FASTLY_HOSTNAME").unwrap(),
+        "msg": msg,
+    }).to_string());
+}
+
 fn main() -> Result<(), Error> {
 
     log_fastly::init_simple("demo_logs", log::LevelFilter::Info);
@@ -25,13 +35,7 @@ fn main() -> Result<(), Error> {
 
     // Upgrade websocket requests
     if let Some("websocket") = req.get_header_str("Upgrade") {
-        log::info!("{}", json!({
-            "logID": log_id(),
-            "session": session_id,
-            "context": "edge",
-            "source": std::env::var("FASTLY_HOSTNAME").unwrap(),
-            "msg": "Upgrading websocket connection",
-        }).to_string());
+        log_demo(session_id, "Upgrading websocket connection");
         return Ok(req.upgrade_websocket("edge_app")?);
     }
 
@@ -90,13 +94,7 @@ fn main() -> Result<(), Error> {
         }
         _ => {
             // incl. index.html
-            log::info!("{}", json!({
-                "logID": log_id(),
-                "session": session_id,
-                "context": "main",
-                "source": std::env::var("FASTLY_HOSTNAME").unwrap(),
-                "msg": "Sending index.html",
-            }).to_string());
+            log_demo(session_id, "Sending index.html");
             response
                 .with_content_type(mime::TEXT_HTML_UTF_8)
                 .with_body(include_str!("index.html"))
