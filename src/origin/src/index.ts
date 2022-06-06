@@ -119,7 +119,7 @@ function logDemo(sessionId: string, msg: string) {
   _logger.log(JSON.stringify({
     logId: generateId(4),
     session: sessionId,
-    context: "main",
+    context: "origin",
     source: fastly.env.get('FASTLY_HOSTNAME'),
     msg,
   }));
