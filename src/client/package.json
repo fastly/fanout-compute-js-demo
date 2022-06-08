@@ -6,7 +6,7 @@
   "packageManager": "pnpm@7.1.9",
   "scripts": {
     "dev": "webpack serve --port 3000",
-    "build": "NODE_ENV=production webpack"
+    "build": "NODE_ENV=production webpack && cp ./build/* ../demo-frontend/src/rsrc"
   },
   "devDependencies": {
     "@types/react": "^18.0.9",
