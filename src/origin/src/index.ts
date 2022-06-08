@@ -16,9 +16,11 @@ const serveGrip = new ServeGrip({
 const router = new Router();
 router.use(serveGrip as any);
 
-router.use(async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers');
+router.all('*', async (req, res) => {
+  res.set({
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers',
+  });
 });
 
 const instance = new Persistence();
@@ -46,7 +48,7 @@ async function processAndSendJsonResult(res: EResponse, fn: () => {} | Promise<{
   }
 
   const body = JSON.stringify(result);
-  res.setHeader('Content-Type', 'application/json');
+  res.set('Content-Type', 'application/json');
   res.send(body);
 
 }
@@ -396,8 +398,8 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
     logDemo(sessionId, 'No messages queued');
   }
 
-  res.setHeader('Keep-Alive-Interval', '20');
-  res.end('');
+  res.set('Keep-Alive-Interval', '20');
+  res.sendStatus(204);
 });
 
 router.get('/', async (req, res) => {
