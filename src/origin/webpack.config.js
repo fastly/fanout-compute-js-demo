@@ -2,6 +2,8 @@ const path = require("path");
 const webpack = require("webpack");
 const { ProvidePlugin } = webpack;
 
+const StringReplaceWebpackPlugin = require("string-replace-webpack-plugin");
+
 console.log(path.resolve(__dirname, "./build/shims/process"));
 module.exports = {
   entry: "./build/index.js",
@@ -24,7 +26,28 @@ module.exports = {
         test: /\.(txt|html)/,
         type: "asset/source",
       },
-    ],
+      {
+        test: /urlpattern\.(c)?js/,
+        use: [
+          StringReplaceWebpackPlugin.replace({
+            replacements: [
+              {
+                pattern: /\/\[\$_\\p\{ID_Start}]\/u/g,
+                replacement: (match, p1, offset, string) => {
+                  return '/[$_A-Za-z]/u';
+                },
+              },
+              {
+                pattern: /\/\[\$_\\u200C\\u200D\\p\{ID_Continue}]\/u/g,
+                replacement: (match, p1, offset, string) => {
+                  return '/[$_\\u200C\\u200DA-Za-z0-9]/u';
+                },
+              },
+            ]
+          }),
+        ],
+      }
+    ]
   },
   plugins: [
     // Polyfills go here.
@@ -33,7 +56,8 @@ module.exports = {
     new ProvidePlugin({
       process: "process",
       Buffer: [ "buffer", "Buffer" ],
-    })
+    }),
+    new StringReplaceWebpackPlugin(),
   ],
   resolve: {
     mainFields: [ 'browser', 'main' ],
