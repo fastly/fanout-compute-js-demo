@@ -69,12 +69,12 @@ fn main() -> Result<(), Error> {
         "/main.js" => {
             response
                 .with_content_type(mime::APPLICATION_JAVASCRIPT_UTF_8)
-                .with_body(include_str!("main.js"))
+                .with_body(include_str!("rsrc/main.js"))
         }
         "/main.css" => {
             response
                 .with_content_type(mime::TEXT_CSS_UTF_8)
-                .with_body(include_str!("main.css"))
+                .with_body(include_str!("rsrc/main.css"))
         }
         "/robots.txt" => {
             response
@@ -97,7 +97,7 @@ fn main() -> Result<(), Error> {
             log_demo(session_id, "Sending index.html");
             response
                 .with_content_type(mime::TEXT_HTML_UTF_8)
-                .with_body(include_str!("index.html"))
+                .with_body(include_str!("rsrc/index.html"))
         }
     };
 
