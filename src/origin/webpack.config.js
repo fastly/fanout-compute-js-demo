@@ -2,7 +2,6 @@ const path = require("path");
 const webpack = require("webpack");
 const { ProvidePlugin } = webpack;
 
-console.log(path.resolve(__dirname, "./build/shims/process"));
 module.exports = {
   entry: "./build/index.js",
   optimization: {
