@@ -3,8 +3,13 @@
     "declaration": true,
     "declarationMap": true,
     "composite": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node16",
+    "module": "commonjs",
     "rootDir": "./src/",
-    "outDir": "./build/"
+    "outDir": "./build/",
+    "target": "es2018",
+    "lib": [ "es2018" ]
   },
   "include": [
     "src"
