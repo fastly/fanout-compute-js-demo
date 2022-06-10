@@ -1,11 +1,9 @@
-import { forwardRef, LegacyRef, ReactNode, useState } from "react";
+import { forwardRef, LegacyRef, useState } from "react";
 import TimeAgo from 'react-timeago';
 import './QuestionsPanel.css';
 import { useAppState } from "../state/components/AppStateProviders";
 import { QuestionInfo, RoomInfo, UserInfo } from "../../../data/src";
 import { useAppController } from "../state/components/AppControllerProvider";
-import { DeleteQuestion } from "./DeleteQuestion";
-import { AnswerQuestion } from "./AnswerQuestion";
 import FlipMove from '../util/components/FlipMove';
 
 export const QuestionItemForwardRef = forwardRef(QuestionItem);
@@ -101,7 +99,7 @@ export function QuestionItem(props: QuestionItemProps, ref: LegacyRef<HTMLDivEle
                           border: "1px solid " + roomInfo.themeColor,
                         }}
                         title="Reply"
-                        onClick={() => controller.enterQuestionUi('answer', userId, roomInfo, questionInfo)}
+                        onClick={() => controller.enterAnswerQuestionUi(roomInfo, questionInfo)}
                 ><span className="material-icons thumbs-up-icon">reply</span></button>
               </div>
             ) : null}
@@ -111,7 +109,7 @@ export function QuestionItem(props: QuestionItemProps, ref: LegacyRef<HTMLDivEle
                         border: "1px solid " + roomInfo.themeColor,
                       }}
                       title="Delete"
-                      onClick={() => controller.enterQuestionUi('delete', userId, roomInfo, questionInfo)}
+                      onClick={() => controller.enterDeleteQuestionUi(roomInfo, questionInfo)}
               ><span className="material-icons thumbs-up-icon">delete</span></button>
             </div>
           </div>
@@ -253,17 +251,6 @@ export function QuestionsPanel() {
     return null;
   }
 
-  let subComponent: ReactNode | null = null;
-  if (state.subMode === 'answer') {
-    subComponent = (
-      <AnswerQuestion />
-    );
-  } else if (state.subMode === 'delete') {
-    subComponent = (
-      <DeleteQuestion />
-    );
-  }
-
   return (
     <div className="QuestionsPanel">
       <QuestionsList userId={userId}
@@ -273,7 +260,6 @@ export function QuestionsPanel() {
                      isHost={isHost}
       />
       <QuestionEntry />
-      {subComponent}
       {state.questions.length === 0 ? (
         <QuestionPrompt />
       ) : null}

@@ -13,7 +13,7 @@ export function AnswerQuestion() {
   const appController = useAppController();
   const appState = useAppState();
 
-  if(appState.subMode !== 'answer' || appState.subModeParams == null) {
+  if(appState.subMode !== 'answer-question' || appState.subModeParams == null) {
     return null;
   }
   const questionInfo: QuestionInfo = appState.subModeParams.questionInfo;
@@ -26,7 +26,7 @@ export function AnswerQuestion() {
 
   return (
     <Modal className="AnswerQuestion"
-           onCancel={() => appController.leaveQuestionUi()}
+           onCancel={() => appController.leaveRoomSubUi()}
     >
       <h1>Reply to Question</h1>
       <div className="question-text-area">
@@ -63,7 +63,7 @@ export function AnswerQuestion() {
                   background: roomInfo.themeColor,
                 }}
                 onClick={async () => {
-                  await appController.leaveQuestionUi();
+                  await appController.leaveRoomSubUi();
                   await appController.answerQuestion(questionInfo.id, textAreaValue);
                 }}
         >Submit</button>{' '}
@@ -72,7 +72,7 @@ export function AnswerQuestion() {
                   background: roomInfo.themeColor,
                 }}
                 onClick={async () => {
-                  await appController.leaveQuestionUi();
+                  await appController.leaveRoomSubUi();
                 }}
         >Cancel</button>
       </div>

@@ -462,29 +462,40 @@ export class AppController {
 
     });
   }
-  enterQuestionUi(subModeName: string, userId: string, roomInfo: RoomInfo, questionInfo: QuestionInfo) {
+  enterAnswerQuestionUi(roomInfo: RoomInfo, questionInfo: QuestionInfo) {
     this.dispatch({
       type: 'MODE_SUBMODE_SWITCH_TO',
-      subMode: subModeName,
+      subMode: 'answer-question',
       params: {
-        userId,
         roomInfo,
         questionInfo,
       },
     });
   }
-  leaveQuestionUi() {
+  enterDeleteQuestionUi(roomInfo: RoomInfo, questionInfo: QuestionInfo) {
     this.dispatch({
       type: 'MODE_SUBMODE_SWITCH_TO',
-      subMode: undefined,
+      subMode: 'delete-question',
+      params: {
+        roomInfo,
+        questionInfo,
+      },
     });
   }
-  enterRoomSubUi(subModeName: string, userId: string, roomInfo: RoomInfo) {
+  enterUserDetailsUi(userId: string) {
     this.dispatch({
       type: 'MODE_SUBMODE_SWITCH_TO',
-      subMode: subModeName,
+      subMode: 'edit-user-details',
       params: {
         userId,
+      },
+    });
+  }
+  enterRoomDetailsUi(roomInfo: RoomInfo) {
+    this.dispatch({
+      type: 'MODE_SUBMODE_SWITCH_TO',
+      subMode: 'edit-room-details',
+      params: {
         roomInfo,
       },
     });

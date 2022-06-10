@@ -1,8 +1,8 @@
+import TimeAgo from "react-timeago";
 import './DeleteQuestion.css';
 import { Modal } from "../util/components/Modal";
 import { useAppState } from "../state/components/AppStateProviders";
 import { QuestionInfo, RoomInfo } from "../../../data/src";
-import TimeAgo from "react-timeago";
 import { useAppController } from "../state/components/AppControllerProvider";
 
 export function DeleteQuestion() {
@@ -10,7 +10,7 @@ export function DeleteQuestion() {
   const appController = useAppController();
 
   const appState = useAppState();
-  if(appState.subMode !== 'delete' || appState.subModeParams == null) {
+  if(appState.subMode !== 'delete-question' || appState.subModeParams == null) {
     return null;
   }
   const questionInfo: QuestionInfo = appState.subModeParams.questionInfo;
@@ -31,7 +31,7 @@ export function DeleteQuestion() {
 
   return (
     <Modal className="DeleteQuestion"
-           onCancel={() => appController.leaveQuestionUi()}
+           onCancel={() => appController.leaveRoomSubUi()}
     >
       <h1>Really Delete this question?</h1>
       <div className="question-text-area">
@@ -83,7 +83,7 @@ export function DeleteQuestion() {
                   background: roomInfo.themeColor,
                 }}
                 onClick={async () => {
-                  await appController.leaveQuestionUi();
+                  await appController.leaveRoomSubUi();
                   await appController.deleteQuestion(questionInfo.id);
                 }}
         >Delete</button>{' '}
@@ -92,7 +92,7 @@ export function DeleteQuestion() {
                   background: roomInfo.themeColor,
                 }}
                 onClick={async () => {
-                  await appController.leaveQuestionUi();
+                  await appController.leaveRoomSubUi();
                 }}
         >Cancel</button>
       </div>

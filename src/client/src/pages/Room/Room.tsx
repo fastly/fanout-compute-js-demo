@@ -6,11 +6,13 @@ import { useAppController } from "../../state/components/AppControllerProvider";
 import { QuestionsPanel } from "../../components/QuestionsPanel";
 import { EditUserDetails } from "../../components/EditUserDetails";
 import { EditRoomDetails } from "../../components/EditRoomDetails";
+import { AnswerQuestion } from "../../components/AnswerQuestion";
+import { DeleteQuestion } from "../../components/DeleteQuestion";
 
 type TitleBarProps = {
-  userId: string;
+  userId: string | null;
   roomInfo: RoomInfo;
-  userInfo?: UserInfo;
+  userInfo: UserInfo | null;
   isHost: boolean;
 }
 function TitleBar(props: TitleBarProps) {
@@ -42,22 +44,30 @@ function TitleBar(props: TitleBarProps) {
         <div className={"spacer " + (isHost ? " edit-button" : "")}>
           {isHost ? (
             <button onClick={() => {
-              actions.enterRoomSubUi('edit-room-details', userId, roomInfo);
+              actions.enterRoomDetailsUi(roomInfo);
             }}><span className="material-icons">edit</span></button>
           ) : null}
         </div>
       </div>
       <div className="spacer user-name-section">
-        <div className="username"
-             onClick={() => {
-               actions.enterRoomSubUi('edit-user-details', userId, roomInfo);
-             }}
-        >
-          {userInfo != null ? userInfo.displayName : userId}
-        </div>
-        <button onClick={() => {
-          actions.enterRoomSubUi('edit-user-details', userId, roomInfo);
-        }}><span className="material-icons">expand_more</span></button>
+        {userId != null ? (
+          <>
+            <div className="username"
+                 onClick={() => {
+                   actions.enterUserDetailsUi(userId);
+                 }}
+            >
+              {userInfo != null ? userInfo.displayName : userId}
+            </div>
+            <button onClick={() => {
+              actions.enterUserDetailsUi(userId);
+            }}><span className="material-icons">expand_more</span></button>
+          </>
+        ) : (
+          <div>
+            No User
+          </div>
+        )}
       </div>
     </div>
   );
@@ -102,13 +112,21 @@ export function Room() {
     subComponent = (
       <EditRoomDetails />
     );
+  } else if (appState.subMode === 'answer-question') {
+    subComponent = (
+      <AnswerQuestion />
+    );
+  } else if (appState.subMode === 'delete-question') {
+    subComponent = (
+      <DeleteQuestion />
+    );
   }
 
   return (
     <div className="Room">
       <TitleBar userId={appState.currentUserId}
                 roomInfo={appState.knownRooms[appState.currentRoomId]}
-                userInfo={appState.knownUsers[appState.currentUserId]}
+                userInfo={appState.currentUserId != null ? appState.knownUsers[appState.currentUserId] : null}
                 isHost={appState.isHost}
       />
       <QuestionsArea roomInfo={appState.knownRooms[appState.currentRoomId]} />

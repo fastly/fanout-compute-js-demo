@@ -1,9 +1,8 @@
+import { useState } from "react";
 import './EditUserDetails.css';
 import { Modal } from "../util/components/Modal";
 import { useAppState } from "../state/components/AppStateProviders";
-import { RoomInfo } from "../../../data/src";
 import { useAppController } from "../state/components/AppControllerProvider";
-import { useState } from "react";
 
 export function EditUserDetails() {
 
@@ -12,7 +11,10 @@ export function EditUserDetails() {
   if(appState.subMode !== 'edit-user-details' || appState.subModeParams == null) {
     return null;
   }
-  const roomInfo: RoomInfo = appState.subModeParams.roomInfo;
+  if(appState.currentRoomId == null) {
+    return null;
+  }
+  const roomInfo = appState.knownRooms[appState.currentRoomId];
   const userId: string = appState.subModeParams.userId;
 
   const knownUsers = appState.knownUsers;
