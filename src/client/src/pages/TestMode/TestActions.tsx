@@ -9,7 +9,7 @@ export function TestActions() {
     <div className="TestActions">
       <h2>Test Actions</h2>
 
-      <div>
+      {/*<div>
         <TestOperation label="Create Room"
                        params={[
                          {paramName: 'userId',},
@@ -127,7 +127,7 @@ export function TestActions() {
                        ]}
                        exec={async (params) => { actions.upVoteQuestionPassive(params.roomId, params.questionId, params.upVotes.split(',').map((x: string)=> x.trim())); }}
         />
-      </div>
+      </div>*/}
 
     </div>
   );
