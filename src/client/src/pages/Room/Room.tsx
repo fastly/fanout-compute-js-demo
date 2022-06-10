@@ -143,32 +143,8 @@ export function Room() {
     (async () => {
       await appController.enterRoom(
         roomId,
-        (result) => {
-          if(cancelEffect) {
-            // effect has been canceled, do nothing
-            console.log("Effect canceled, do nothing");
-            return false;
-          }
-          if(result === false) {
-            // We've clicked the cancel link in the "create room" modal
-            navigate('../');
-            return false;
-          }
-          return true;
-        },
-        (result) => {
-          if(cancelEffect) {
-            // effect has been canceled, do nothing
-            console.log("Effect canceled, do nothing");
-            return false;
-          }
-          if(result === false) {
-            // We've clicked the cancel link in the "enter username" modal
-            navigate('../');
-            return false;
-          }
-          return true;
-        }
+        () => cancelEffect,
+        () => { navigate('../'); }
       );
     })();
 

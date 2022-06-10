@@ -35,8 +35,8 @@ export class AppController {
     });
   }
   async enterRoom(roomId: string,
-                  onCreateRoomResult: (result: CreateRoomResult) => boolean,
-                  onEnterUserInfoResult: (result: EnterUserInfoResult) => boolean,
+                  fnCheckCancelEffect: () => boolean,
+                  onCancelEnterRoom: () => void,
   ) {
     // land in room
     // 1. enter the room
@@ -54,12 +54,24 @@ export class AppController {
       console.log('Attempting to land in room', roomId);
       let roomInfoFull: FullRoomInfo;
       try {
-        roomInfoFull = await instance.getFullRoomInfo(roomId);
+        try {
+          roomInfoFull = await instance.getFullRoomInfo(roomId);
+        } finally {
+          if(fnCheckCancelEffect()) {
+            return;
+          }
+        }
       } catch(ex) {
-        console.log('room not exist');
-
-        const result = await this.doCreateRoomUi(roomId);
-        if(!onCreateRoomResult(result) || result === false) {
+        let result;
+        try {
+          result = await this.doCreateRoomUi(roomId);
+        } finally {
+          if(fnCheckCancelEffect()) {
+            return;
+          }
+        }
+        if(result === false) {
+          onCancelEnterRoom();
           return;
         }
 
@@ -68,13 +80,16 @@ export class AppController {
         // a username.
 
         // Create a new room
-        const roomInfo = await instance.createRoom(roomId, result.roomDisplayName, result.roomThemeColor);
+        let roomInfo;
+        try {
+          roomInfo = await instance.createRoom(roomId, result.roomDisplayName, result.roomThemeColor);
+        } finally {
+          if(fnCheckCancelEffect()) {
+            return;
+          }
+        }
 
         const userId = result.userId ?? getState().currentUserId;
-        if(userId == null) {
-          // This is bizarre, we should have a username by now.
-          console.log("Why don't we have a username?");
-        }
 
         let userInfos: UserInfo[] = [];
         if(userId != null) {
@@ -82,6 +97,10 @@ export class AppController {
             const userInfo = await instance.getUserInfo(userId);
             userInfos.push(userInfo);
           } catch {
+          } finally {
+            if(fnCheckCancelEffect()) {
+              return;
+            }
           }
         }
 
@@ -123,8 +142,16 @@ export class AppController {
 
       if(getState().currentUserId == null) {
         // No user, so let's ask for one
-        const result = await this.doEnterUserInfoUi();
-        if(!onEnterUserInfoResult(result) || result === false) {
+        let result;
+        try {
+          result = await this.doEnterUserInfoUi();
+        } finally {
+          if(fnCheckCancelEffect()) {
+            return;
+          }
+        }
+        if(result === false) {
+          onCancelEnterRoom();
           return;
         }
         this.setUserId(result.userId, result.asHost);
@@ -136,6 +163,10 @@ export class AppController {
             displayName: userInfo.displayName,
           });
         } catch {
+        } finally {
+          if(fnCheckCancelEffect()) {
+            return;
+          }
         }
       }
     });
