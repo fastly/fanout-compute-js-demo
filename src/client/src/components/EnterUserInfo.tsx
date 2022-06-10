@@ -2,16 +2,15 @@ import { useState } from "react";
 import './EnterUserInfo.css';
 import { Modal } from "../util/components/Modal";
 import { useAppState } from "../state/components/AppStateProviders";
+import { useAppController } from "../state/components/AppControllerProvider";
 import { useRoomInfo } from "../state/components/RoomInfoProvider";
 import { FieldError, validateUserId } from "../util/validation";
 
-type Props = {
-  onSubmit: (userId: string, asHost: boolean) => void,
-  onCancel: () => void,
-};
-export function EnterUserInfo(props: Props) {
+export function EnterUserInfo() {
 
   const appState = useAppState();
+  const appController = useAppController();
+
   const roomInfo = useRoomInfo();
 
   if(appState.subMode !== 'enter-user-info') {
@@ -51,7 +50,7 @@ export function EnterUserInfo(props: Props) {
                   return;
                 }
 
-                props.onSubmit(userId, asHost);
+                appController.submitEnterUserInfoUi(userId, asHost);
               } finally {
                 setSubmitting(false);
               }
@@ -104,7 +103,7 @@ export function EnterUserInfo(props: Props) {
         <div className="back-label">
           <button onClick={async (e) => {
             e.preventDefault();
-            props.onCancel();
+            appController.cancelEnterUserInfoUi();
           }}>Return to Top</button>
         </div>
       </div>

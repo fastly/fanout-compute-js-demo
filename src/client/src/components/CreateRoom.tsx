@@ -1,18 +1,16 @@
+import { useState } from "react";
 import './CreateRoom.css';
 import { useAppState } from "../state/components/AppStateProviders";
+import { useAppController } from "../state/components/AppControllerProvider";
 import { Modal } from "../util/components/Modal";
-import { FieldError, validateRoomId, validateUserId } from "../util/validation";
+import { FieldError, validateUserId } from "../util/validation";
 import { ColorPicker } from "./ColorPicker";
 import { THEME_COLORS } from "../constants";
-import { useState } from "react";
 
-type Props = {
-  onSubmit: (roomDisplayName: string, roomThemeColor: string, userId?: string) => void,
-  onCancel: () => void,
-};
-export function CreateRoom(props: Props) {
+export function CreateRoom() {
 
   const appState = useAppState();
+  const appController = useAppController();
 
   // If we are here we can pretty much assume we are in the right submode
   if(appState.subMode !== 'create-room' || appState.subModeParams == null) {
@@ -58,7 +56,7 @@ export function CreateRoom(props: Props) {
                   return;
                 }
 
-                props.onSubmit(roomDisplayName, roomThemeColor, useUserIdInput ? userId : undefined);
+                appController.submitCreateRoomUi(roomDisplayName, roomThemeColor, userId);
               } finally {
                 setSubmitting(false);
               }
@@ -141,7 +139,7 @@ export function CreateRoom(props: Props) {
         <div className="back-label">
           <button onClick={async (e) => {
             e.preventDefault();
-            props.onCancel();
+            appController.cancelCreateRoomUi();
           }}>Return to Top</button>
         </div>
       </div>

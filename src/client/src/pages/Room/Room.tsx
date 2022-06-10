@@ -163,25 +163,11 @@ export function Room() {
 
   if (appState.subMode === 'create-room') {
     subComponent = (
-      <CreateRoom
-        onSubmit={(roomDisplayName, roomThemeColor, userId) => {
-          appController.submitCreateRoomUi(roomDisplayName, roomThemeColor, userId);
-        }}
-        onCancel={() => {
-          appController.cancelCreateRoomUi();
-        }}
-      />
+      <CreateRoom />
     );
   } else if (appState.subMode === 'enter-user-info') {
     subComponent = (
-      <EnterUserInfo
-        onSubmit={(userId, asHost) => {
-          appController.submitEnterUserInfoUi(userId, asHost);
-        }}
-        onCancel={() => {
-          appController.cancelEnterUserInfoUi();
-        }}
-      />
+      <EnterUserInfo />
     );
   } else if (appState.subMode === 'edit-user-details') {
     subComponent = (
