@@ -128,12 +128,14 @@ export function Room() {
     });
     webSocket.addEventListener('open', () => {
       console.log('Websocket opened.');
+      appController.webSocket = webSocket;
       webSocketRef.current = webSocket;
     });
     return () => {
       console.log('Closing websocket.');
       webSocket.close();
       webSocketRef.current = null;
+      appController.webSocket = null;
     };
   }, [roomId]);
 

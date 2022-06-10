@@ -17,7 +17,22 @@ type EnterUserInfoResult = {
 export class AppController {
   constructor(
     private dispatch: ActionOrFunctionDispatcher<AppState, AppStateAction>
-  ) {}
+  ) {
+    this.webSocket = null;
+  }
+
+  webSocket: WebSocket | null;
+
+  webSocketSend(payload: Record<string, any>) {
+    if(this.webSocket != null) {
+      const message = JSON.stringify(payload);
+      console.log('Sending message \'' + message + '\'.');
+      this.webSocket.send(message);
+    } else {
+      console.log('Attempt to send to non-open WebSocket.');
+    }
+  }
+
   testMode(enable: boolean = true) {
     this.dispatch({
       type: 'TEST_MODE',
@@ -260,7 +275,7 @@ export class AppController {
         userData,
       };
 
-      // this.wsContext.send(JSON.stringify(payload));
+      this.webSocketSend(payload);
     });
   }
   async updateRoomInfo(roomId: string, roomData: Partial<RoomData>) {
@@ -288,7 +303,7 @@ export class AppController {
         roomData,
       };
 
-      // this.wsContext.send(JSON.stringify(payload));
+      this.webSocketSend(payload);
     });
   }
   async postQuestion(roomId: string, questionText: string) {
@@ -327,7 +342,7 @@ export class AppController {
         questionText,
       };
 
-      // this.wsContext.send(JSON.stringify(payload));
+      this.webSocketSend(payload);
     });
   }
   async answerQuestion(roomId: string, questionId: string, answerText: string) {
@@ -361,7 +376,7 @@ export class AppController {
         answerText,
       };
 
-      // this.wsContext.send(JSON.stringify(payload));
+      this.webSocketSend(payload);
     });
   }
   async deleteQuestion(roomId: string, questionId: string) {
@@ -383,7 +398,7 @@ export class AppController {
         questionId,
       };
 
-      // this.wsContext.send(JSON.stringify(payload));
+      this.webSocketSend(payload);
     });
   }
   enterAnswerQuestionUi(questionInfo: QuestionInfo) {
@@ -445,7 +460,7 @@ export class AppController {
         removeUpvote,
       };
 
-      // this.wsContext.send(JSON.stringify(payload));
+      this.webSocketSend(payload);
     });
   }
   passiveUpdate(
