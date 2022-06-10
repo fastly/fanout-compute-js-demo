@@ -54,12 +54,6 @@ const initialState: AppState = {
   questions: [],
 };
 
-export interface FieldError {
-  fieldName: string;
-  errorCode: string;
-  errorDescription: string;
-}
-
 interface ActionTestMode {
   type: 'TEST_MODE';
   value: boolean;

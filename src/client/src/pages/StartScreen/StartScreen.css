@@ -73,6 +73,11 @@
   padding: 4px 16px;
   cursor: pointer;
 }
+.StartScreen > .main-area > .start-form .submit-button-group button[disabled] {
+  border: 1px solid lightgray;
+  color: white;
+  background: lightgray;
+}
 
 .StartScreen > .main-area > .start-form .error-group {
   font-size: 16px;

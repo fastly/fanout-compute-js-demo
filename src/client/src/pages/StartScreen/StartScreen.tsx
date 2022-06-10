@@ -3,34 +3,25 @@
 
 // Or you can create a new room if you are hosting an event
 
-import { useRef, useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import './StartScreen.css';
 
-import { FieldError } from "../../state/state";
 import { useAppController } from "../../state/components/AppControllerProvider";
 import { useAppState } from "../../state/components/AppStateProviders";
-import { CreateRoom } from "../CreateRoom/CreateRoom";
+import { FieldError, validateRoomId, validateUserId } from "../../util/validation";
 
-export function StartScreenBody() {
-  const formRef = useRef<HTMLFormElement>(null);
-
+export function StartScreen() {
   const appController = useAppController();
+  const state = useAppState();
+  const navigate = useNavigate();
 
-  const [ userId, setUserId ] = useState('');
+  const [ userId, setUserId ] = useState(state.currentUserId ?? '');
   const [ roomId, setRoomId ] = useState('');
   const [ asHost, setAsHost ] = useState(false);
 
   const [ errors, setErrors ] = useState<FieldError[]>();
   const [ submitting, setSubmitting ] = useState<boolean>(false);
-
-  async function onError(errorItems: FieldError[]) {
-    if(errorItems.some(x => x.fieldName === 'roomId' && x.errorCode === 'NOTEXIST')) {
-      // We will switch to the Room Creation UI.
-      await appController.startRoomCreationUi(userId, roomId);
-      return;
-    }
-    setErrors(errorItems);
-  }
 
   const disableForm = submitting;
 
@@ -45,15 +36,25 @@ export function StartScreenBody() {
           <div className="start-message">
             It's easy to get started!
           </div>
-          <form ref={formRef}
-                onSubmit={async (e) => {
+          <form onSubmit={async (e) => {
+                  e.preventDefault();
                   if(disableForm) {
                     return;
                   }
                   setSubmitting(true);
                   try {
-                    e.preventDefault();
-                    await appController.enterRoom(userId, roomId, asHost, onError);
+                    const errors: FieldError[] = [];
+
+                    errors.push(...validateUserId(userId));
+                    errors.push(...validateRoomId(roomId));
+
+                    if(errors.length > 0) {
+                      setErrors(errors);
+                      return;
+                    }
+
+                    appController.setUserId(userId, asHost);
+                    navigate('./' + roomId);
                   } finally {
                     setSubmitting(false);
                   }
@@ -114,19 +115,4 @@ export function StartScreenBody() {
       </div>
     </div>
   );
-}
-
-export function StartScreen() {
-  const appState = useAppState();
-
-  if(appState.subMode === 'room-creation') {
-    return (
-      <CreateRoom />
-    );
-  }
-
-  return (
-    <StartScreenBody />
-  );
-
 }

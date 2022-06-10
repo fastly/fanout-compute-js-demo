@@ -17,7 +17,7 @@ export function TestActions() {
                          {paramName: 'displayName',},
                          {paramName: 'themeColor',},
                        ]}
-                       exec={async (params) => await actions.startNewRoom(params.userId, params.roomId, params.displayName, params.themeColor)}
+                       exec={async (params) => await actions.startNewRoom(params.roomId, params.displayName, params.themeColor)}
         />
       </div>
 
@@ -28,13 +28,13 @@ export function TestActions() {
                          {paramName: 'roomId',},
                          {paramName: 'asHost', type: 'boolean'},
                        ]}
-                       exec={async (params) => await actions.enterRoom(params.userId, params.roomId, params.asHost)}
+                       exec={async (params) => await actions.enterRoom(params.roomId)}
         />
       </div>
 
       <div>
         <TestOperation label="Leave Room"
-                       exec={async (params) => await actions.leaveRoom()}
+                       exec={async (params) => actions.leaveRoom()}
         />
       </div>
 

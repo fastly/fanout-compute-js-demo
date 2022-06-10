@@ -1,4 +1,5 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import { useNavigate, useParams } from 'react-router-dom';
 import './Room.css';
 import { useAppState } from "../../state/components/AppStateProviders";
 import { RoomInfo, UserInfo } from "../../../../data/src";
@@ -14,6 +15,7 @@ type TitleBarProps = {
   roomInfo: RoomInfo;
   userInfo: UserInfo | null;
   isHost: boolean;
+  onExitButton: () => void;
 }
 function TitleBar(props: TitleBarProps) {
 
@@ -28,9 +30,7 @@ function TitleBar(props: TitleBarProps) {
          }}
     >
       <div className="spacer exit-section">
-        <button className="exit-button"
-                onClick={() => actions.leaveRoom()}
-        ><span className="material-icons">navigate_before</span><div className="exit-text">Exit</div></button>
+        <button className="exit-button" onClick={props.onExitButton}><span className="material-icons">navigate_before</span><div className="exit-text">Exit</div></button>
       </div>
       <div className="room-name-section">
         <div className="spacer"></div>
@@ -97,9 +97,63 @@ function QuestionsArea(props: QuestionsAreaProps) {
 
 export function Room() {
 
+  // Landing in this room will cause us to switch to the room if
+  // we aren't already in there.
+  const navigate = useNavigate();
+  const params = useParams();
+  const roomId: string = params.roomId!;
+
+  const appController = useAppController();
   const appState = useAppState();
 
-  if(appState.currentUserId == null || appState.currentRoomId == null) {
+  const [ landing, setLanding ] = useState(false);
+
+  useEffect(() => {
+    // land in room
+    // 1. enter the room
+    // room does not exist -> 2.
+    // room exists -> 4.
+    // 2. open create room box
+    // 3. accept user, room ID
+    // create the room
+    // enter the room -> 4.
+    // 4. open websocket
+    // 5. do we have a current user?
+    // no -> 6.
+    // yes -> 7.
+    // 6. open enter name box
+    // 7. people can use the UI
+    if(landing) {
+      console.log('ss return');
+      return;
+    }
+    (async () => {
+      setLanding(true);
+      console.log('Attempting to land in room', roomId);
+      try {
+        //await appController.enterRoom(roomId);
+        // If we get this far, we should now have a websocket
+        if(appState.currentUserId != null) {
+          console.log('user exists', appState.currentUserId);
+        } else {
+          console.log('no user');
+        }
+      } catch(ex) {
+        if(ex === 'NOTEXIST') {
+          console.log('room not exist');
+        }
+      } finally {
+        setLanding(false);
+      }
+    })();
+
+    return () => {
+      console.log('Leaving room');
+      //appController.leaveRoom();
+    };
+  }, [roomId]);
+
+  if(appState.currentRoomId == null) {
     return null;
   }
 
@@ -128,6 +182,7 @@ export function Room() {
                 roomInfo={appState.knownRooms[appState.currentRoomId]}
                 userInfo={appState.currentUserId != null ? appState.knownUsers[appState.currentUserId] : null}
                 isHost={appState.isHost}
+                onExitButton={() => { navigate('../'); }}
       />
       <QuestionsArea roomInfo={appState.knownRooms[appState.currentRoomId]} />
       {subComponent}
