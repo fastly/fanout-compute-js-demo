@@ -2,19 +2,19 @@ import TimeAgo from "react-timeago";
 import './DeleteQuestion.css';
 import { Modal } from "../util/components/Modal";
 import { useAppState } from "../state/components/AppStateProviders";
-import { QuestionInfo, RoomInfo } from "../../../data/src";
+import { QuestionInfo } from "../../../data/src";
 import { useAppController } from "../state/components/AppControllerProvider";
+import { useRoomInfo } from "../state/components/RoomInfoProvider";
 
 export function DeleteQuestion() {
 
   const appController = useAppController();
-
   const appState = useAppState();
+  const roomInfo = useRoomInfo();
   if(appState.subMode !== 'delete-question' || appState.subModeParams == null) {
     return null;
   }
   const questionInfo: QuestionInfo = appState.subModeParams.questionInfo;
-  const roomInfo: RoomInfo = appState.subModeParams.roomInfo;
 
   const knownUsers = appState.knownUsers;
   const authorDisplayName = knownUsers[questionInfo.author]?.displayName ?? questionInfo.author;
@@ -84,7 +84,7 @@ export function DeleteQuestion() {
                 }}
                 onClick={async () => {
                   await appController.leaveRoomSubUi();
-                  await appController.deleteQuestion(questionInfo.id);
+                  await appController.deleteQuestion(roomInfo.id, questionInfo.id);
                 }}
         >Delete</button>{' '}
         <button style={{

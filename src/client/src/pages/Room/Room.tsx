@@ -4,6 +4,7 @@ import './Room.css';
 import { useAppState } from "../../state/components/AppStateProviders";
 import { RoomInfo, UserInfo } from "../../../../data/src";
 import { useAppController } from "../../state/components/AppControllerProvider";
+import { RoomInfoProvider, useRoomInfo } from "../../state/components/RoomInfoProvider";
 import { QuestionsPanel } from "../../components/QuestionsPanel";
 import { EditUserDetails } from "../../components/EditUserDetails";
 import { EditRoomDetails } from "../../components/EditRoomDetails";
@@ -12,7 +13,6 @@ import { DeleteQuestion } from "../../components/DeleteQuestion";
 
 type TitleBarProps = {
   userId: string | null;
-  roomInfo: RoomInfo;
   userInfo: UserInfo | null;
   isHost: boolean;
   onExitButton: () => void;
@@ -20,8 +20,9 @@ type TitleBarProps = {
 function TitleBar(props: TitleBarProps) {
 
   const actions = useAppController();
+  const roomInfo = useRoomInfo();
 
-  const { roomInfo, userId, userInfo, isHost } = props;
+  const { userId, userInfo, isHost } = props;
 
   return (
     <div className="title-bar"
@@ -44,7 +45,7 @@ function TitleBar(props: TitleBarProps) {
         <div className={"spacer " + (isHost ? " edit-button" : "")}>
           {isHost ? (
             <button onClick={() => {
-              actions.enterRoomDetailsUi(roomInfo);
+              actions.enterRoomDetailsUi();
             }}><span className="material-icons">edit</span></button>
           ) : null}
         </div>
@@ -74,12 +75,9 @@ function TitleBar(props: TitleBarProps) {
 
 }
 
-type QuestionsAreaProps = {
-  roomInfo: RoomInfo;
-}
-function QuestionsArea(props: QuestionsAreaProps) {
+function QuestionsArea() {
 
-  const { roomInfo } = props;
+  const roomInfo = useRoomInfo();
 
   const backgroundString =
     `linear-gradient(0deg, ${roomInfo.themeColor} 0%, rgba(255, 255, 255,1) 50%)`;
@@ -177,16 +175,17 @@ export function Room() {
   }
 
   return (
-    <div className="Room">
-      <TitleBar userId={appState.currentUserId}
-                roomInfo={appState.knownRooms[appState.currentRoomId]}
-                userInfo={appState.currentUserId != null ? appState.knownUsers[appState.currentUserId] : null}
-                isHost={appState.isHost}
-                onExitButton={() => { navigate('../'); }}
-      />
-      <QuestionsArea roomInfo={appState.knownRooms[appState.currentRoomId]} />
-      {subComponent}
-    </div>
+    <RoomInfoProvider roomId={roomId}>
+      <div className="Room">
+        <TitleBar userId={appState.currentUserId}
+                  userInfo={appState.currentUserId != null ? appState.knownUsers[appState.currentUserId] : null}
+                  isHost={appState.isHost}
+                  onExitButton={() => { navigate('../'); }}
+        />
+        <QuestionsArea />
+        {subComponent}
+      </div>
+    </RoomInfoProvider>
   );
 
 }

@@ -50,27 +50,30 @@ export function TestActions() {
       <div>
         <TestOperation label="Add/Change Display Name for room"
                        params={[
+                         {paramName: 'roomId',},
                          {paramName: 'displayName',},
                        ]}
-                       exec={async (params) => await actions.updateRoomInfo({displayName: params.displayName})}
+                       exec={async (params) => await actions.updateRoomInfo(params.roomId, {displayName: params.displayName})}
         />
       </div>
 
       <div>
         <TestOperation label="Change room theme color"
                        params={[
+                         {paramName: 'roomId',},
                          {paramName: 'themeColor',},
                        ]}
-                       exec={async (params) => await actions.updateRoomInfo({themeColor: params.themeColor})}
+                       exec={async (params) => await actions.updateRoomInfo(params.roomId, {themeColor: params.themeColor})}
         />
       </div>
 
       <div>
         <TestOperation label="Post Question"
                        params={[
+                         {paramName: 'roomId',},
                          {paramName: 'questionText',},
                        ]}
-                       exec={async (params) => await actions.postQuestion(params.questionText)}
+                       exec={async (params) => await actions.postQuestion(params.roomId, params.questionText)}
         />
       </div>
 
@@ -86,29 +89,32 @@ export function TestActions() {
       <div>
         <TestOperation label="Answer Question (host)"
                        params={[
+                         {paramName: 'roomId',},
                          {paramName: 'questionId',},
                          {paramName: 'answerText',},
                        ]}
-                       exec={async (params) => await actions.answerQuestion(params.questionId, params.answerText)}
+                       exec={async (params) => await actions.answerQuestion(params.roomId, params.questionId, params.answerText)}
         />
       </div>
 
       <div>
         <TestOperation label="Delete Question (host)"
                        params={[
+                         {paramName: 'roomId',},
                          {paramName: 'questionId',},
                        ]}
-                       exec={async (params) => await actions.deleteQuestion(params.questionId)}
+                       exec={async (params) => await actions.deleteQuestion(params.roomId, params.questionId)}
         />
       </div>
 
       <div>
         <TestOperation label="Upvote question"
                        params={[
+                         {paramName: 'roomId',},
                          {paramName: 'questionId',},
                          {paramName: 'removeUpvote', type: 'boolean'}
                        ]}
-                       exec={async (params) => { actions.upVoteQuestion(params.questionId, params.removeUpvote); }}
+                       exec={async (params) => { actions.upVoteQuestion(params.roomId, params.questionId, params.removeUpvote); }}
         />
       </div>
 

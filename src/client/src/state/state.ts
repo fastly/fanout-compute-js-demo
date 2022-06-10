@@ -25,7 +25,6 @@ export interface AppState {
   test_mode: boolean;
   test_mode_button: boolean;
   stateFlags: AppStateFlags;
-  currentRoomId: string | null;
   currentUserId: string | null;
   isHost: boolean;
   questions: QuestionInfo[];
@@ -42,7 +41,6 @@ const initialState: AppState = {
     joiningRoom: false,
     leavingRoom: false,
   },
-  currentRoomId: null,
   currentUserId: null,
   isHost: false,
   knownUsers: {},
@@ -83,10 +81,6 @@ interface ActionSetKnownUserInfo extends UserData {
 interface ActionUpdateKnownUserInfo extends Partial<UserData> {
   type: 'KNOWNUSER_UPDATE_INFO';
   userId: string;
-}
-interface ActionSetRoomId {
-  type: 'ROOM_SET_ID';
-  value: string | null;
 }
 interface ActionSetKnownRoomInfo extends RoomData {
   type: 'KNOWNROOM_SET_INFO';
@@ -135,7 +129,6 @@ export type AppStateAction =
   ActionSetIsHost |
   ActionSetKnownUserInfo |
   ActionUpdateKnownUserInfo |
-  ActionSetRoomId |
   ActionSetKnownRoomInfo |
   ActionUpdateKnownRoomInfo |
   ActionQuestionsForgetAll |
@@ -169,11 +162,6 @@ function reducer(state: AppState, action: AppStateAction): AppState {
       return {
         ...state,
         isHost: action.value,
-      };
-    case 'ROOM_SET_ID':
-      return {
-        ...state,
-        currentRoomId: action.value,
       };
     case 'KNOWNROOM_SET_INFO':
       return {
@@ -312,9 +300,6 @@ function reducer(state: AppState, action: AppStateAction): AppState {
       };
     }
     case 'QUESTION_UPVOTE': {
-      if(state.currentRoomId !== action.roomId) {
-        return state;
-      }
       const questionIndex = state.questions.findIndex(q => q.id === action.questionId);
       if(questionIndex === -1) {
         return state;

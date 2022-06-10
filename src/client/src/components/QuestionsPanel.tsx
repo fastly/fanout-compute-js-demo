@@ -2,26 +2,26 @@ import { forwardRef, LegacyRef, useState } from "react";
 import TimeAgo from 'react-timeago';
 import './QuestionsPanel.css';
 import { useAppState } from "../state/components/AppStateProviders";
-import { QuestionInfo, RoomInfo, UserInfo } from "../../../data/src";
+import { QuestionInfo, UserInfo } from "../../../data/src";
 import { useAppController } from "../state/components/AppControllerProvider";
 import FlipMove from '../util/components/FlipMove';
+import { useRoomInfo } from "../state/components/RoomInfoProvider";
 
 export const QuestionItemForwardRef = forwardRef(QuestionItem);
 
 type QuestionItemProps = {
   userId: string;
   knownUsers: Record<string, UserInfo>;
-  roomInfo: RoomInfo;
   questionInfo: QuestionInfo;
   isHost: boolean;
 };
 export function QuestionItem(props: QuestionItemProps, ref: LegacyRef<HTMLDivElement>) {
 
   const controller = useAppController();
+  const roomInfo = useRoomInfo();
 
   const userId = props.userId;
   const knownUsers = props.knownUsers;
-  const roomInfo = props.roomInfo;
   const questionInfo = props.questionInfo;
   const isHost = props.isHost;
 
@@ -87,7 +87,7 @@ export function QuestionItem(props: QuestionItemProps, ref: LegacyRef<HTMLDivEle
                     border: "1px solid " + roomInfo.themeColor,
                     ...selfUpVoted ? { background: roomInfo.themeColor } : {},
                   }}
-                  onClick={() => controller.upVoteQuestion(questionInfo.id, selfUpVoted)}
+                  onClick={() => controller.upVoteQuestion(roomInfo.id, questionInfo.id, selfUpVoted)}
           ><div className="count">{questionInfo.upVotes.length}</div> <span className="material-icons thumbs-up-icon">thumb_up</span></button>
         </div>
         {isHost ? (
@@ -99,7 +99,7 @@ export function QuestionItem(props: QuestionItemProps, ref: LegacyRef<HTMLDivEle
                           border: "1px solid " + roomInfo.themeColor,
                         }}
                         title="Reply"
-                        onClick={() => controller.enterAnswerQuestionUi(roomInfo, questionInfo)}
+                        onClick={() => controller.enterAnswerQuestionUi(questionInfo)}
                 ><span className="material-icons thumbs-up-icon">reply</span></button>
               </div>
             ) : null}
@@ -109,7 +109,7 @@ export function QuestionItem(props: QuestionItemProps, ref: LegacyRef<HTMLDivEle
                         border: "1px solid " + roomInfo.themeColor,
                       }}
                       title="Delete"
-                      onClick={() => controller.enterDeleteQuestionUi(roomInfo, questionInfo)}
+                      onClick={() => controller.enterDeleteQuestionUi(questionInfo)}
               ><span className="material-icons thumbs-up-icon">delete</span></button>
             </div>
           </div>
@@ -161,7 +161,6 @@ function questionListSort(a: QuestionInfo, b: QuestionInfo): number {
 type QuestionsListProps = {
   userId: string;
   knownUsers: Record<string, UserInfo>;
-  roomInfo: RoomInfo;
   questions: QuestionInfo[];
   isHost: boolean;
 };
@@ -169,7 +168,6 @@ export function QuestionsList(props: QuestionsListProps) {
 
   const userId = props.userId;
   const knownUsers = props.knownUsers;
-  const roomInfo = props.roomInfo;
   const isHost = props.isHost;
   const sortedQuestions = props.questions.slice();
   sortedQuestions.sort(questionListSort);
@@ -181,7 +179,6 @@ export function QuestionsList(props: QuestionsListProps) {
         <QuestionItemForwardRef key={q.id}
                                 userId={userId}
                                 knownUsers={knownUsers}
-                                roomInfo={roomInfo}
                                 questionInfo={q}
                                 isHost={isHost}
         />
@@ -192,6 +189,7 @@ export function QuestionsList(props: QuestionsListProps) {
 
 export function QuestionEntry() {
   const controller = useAppController();
+  const roomInfo = useRoomInfo();
 
   const [ submitting, setSubmitting ] = useState<boolean>(false);
   const [ questionTextValue, setQuestionTextValue ] = useState('');
@@ -214,7 +212,7 @@ export function QuestionEntry() {
                 onClick={async (e) => {
                   setSubmitting(true);
                   try {
-                    await controller.postQuestion(questionTextValue);
+                    await controller.postQuestion(roomInfo.id, questionTextValue);
                   } finally {
                     setQuestionTextValue('');
                     setSubmitting(false);
@@ -245,9 +243,8 @@ export function QuestionsPanel() {
 
   const state = useAppState();
   const userId = state.currentUserId;
-  const roomId = state.currentRoomId;
   const isHost = state.isHost;
-  if(userId == null || roomId == null) {
+  if(userId == null) {
     return null;
   }
 
@@ -255,7 +252,6 @@ export function QuestionsPanel() {
     <div className="QuestionsPanel">
       <QuestionsList userId={userId}
                      knownUsers={state.knownUsers}
-                     roomInfo={state.knownRooms[roomId]}
                      questions={state.questions}
                      isHost={isHost}
       />

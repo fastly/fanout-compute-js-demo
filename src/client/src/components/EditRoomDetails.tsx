@@ -1,20 +1,20 @@
 import './EditRoomDetails.css';
 import { Modal } from "../util/components/Modal";
 import { useAppState } from "../state/components/AppStateProviders";
-import { RoomInfo } from "../../../data/src";
 import { useAppController } from "../state/components/AppControllerProvider";
 import { useState } from "react";
 import { ColorPicker } from "./ColorPicker";
 import { THEME_COLORS } from "../constants";
+import { useRoomInfo } from "../state/components/RoomInfoProvider";
 
 export function EditRoomDetails() {
 
   const appController = useAppController();
   const appState = useAppState();
-  if(appState.subMode !== 'edit-room-details' || appState.subModeParams == null) {
+  const roomInfo = useRoomInfo();
+  if(appState.subMode !== 'edit-room-details') {
     return null;
   }
-  const roomInfo: RoomInfo = appState.subModeParams.roomInfo;
 
   const [ displayName, setDisplayName ] = useState(roomInfo.displayName);
   const [ themeColor, setThemeColor ] = useState(roomInfo.themeColor);
@@ -62,7 +62,7 @@ export function EditRoomDetails() {
                 }}
                 onClick={async () => {
                   await appController.leaveRoomSubUi();
-                  await appController.updateRoomInfo({displayName, themeColor});
+                  await appController.updateRoomInfo(roomInfo.id, {displayName, themeColor});
                 }}
         >Update</button>{' '}
         <button style={{

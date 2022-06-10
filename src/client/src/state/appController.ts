@@ -91,11 +91,6 @@ export class AppController {
           throw 'EXISTS';
         }
 
-        this.dispatch({
-          type: 'ROOM_SET_ID',
-          value: roomId,
-        });
-
         this.openWs(roomId);
         // TODO error stuff
         const connectPromise = new Promise<void>(resolve => {
@@ -172,10 +167,6 @@ export class AppController {
       try {
         this.closeWs();
         this.dispatch({
-          type: 'ROOM_SET_ID',
-          value: null,
-        });
-        this.dispatch({
           type: 'QUESTIONS_FORGET_ALL',
         });
         this.dispatch({
@@ -239,18 +230,16 @@ export class AppController {
       subMode: undefined,
     });
   }
-  async updateRoomInfo(roomData: Partial<RoomData>) {
+  async updateRoomInfo(roomId: string, roomData: Partial<RoomData>) {
     if(!this.isWebsocketConnected()) {
       return;
     }
     this.dispatch(async (dispatch, getState) => {
 
       const state = getState();
-      const roomId = state.currentRoomId;
       const stateFlags = state.stateFlags;
 
-      if (roomId == null ||
-        stateFlags.joiningRoom ||
+      if (stateFlags.joiningRoom ||
         stateFlags.leavingRoom
       ) {
         return;
@@ -272,7 +261,7 @@ export class AppController {
       this.wsContext.send(JSON.stringify(payload));
     });
   }
-  async postQuestion(questionText: string) {
+  async postQuestion(roomId: string, questionText: string) {
     if(!this.isWebsocketConnected()) {
       return;
     }
@@ -280,11 +269,9 @@ export class AppController {
 
       const state = getState();
       const userId = state.currentUserId;
-      const roomId = state.currentRoomId;
       const stateFlags = state.stateFlags;
 
       if (userId == null ||
-        roomId == null ||
         stateFlags.joiningRoom ||
         stateFlags.leavingRoom
       ) {
@@ -316,7 +303,7 @@ export class AppController {
       this.wsContext.send(JSON.stringify(payload));
     });
   }
-  async answerQuestion(questionId: string, answerText: string) {
+  async answerQuestion(roomId: string, questionId: string, answerText: string) {
     if(!this.isWebsocketConnected()) {
       return;
     }
@@ -324,11 +311,9 @@ export class AppController {
 
       const state = getState();
       const userId = state.currentUserId;
-      const roomId = state.currentRoomId;
       const stateFlags = state.stateFlags;
 
       if (userId == null ||
-        roomId == null ||
         stateFlags.joiningRoom ||
         stateFlags.leavingRoom
       ) {
@@ -355,7 +340,7 @@ export class AppController {
       this.wsContext.send(JSON.stringify(payload));
     });
   }
-  async deleteQuestion(questionId: string) {
+  async deleteQuestion(roomId: string, questionId: string) {
     if(!this.isWebsocketConnected()) {
       // make sure we only delete questions when
       // we are connected to websocket
@@ -364,10 +349,8 @@ export class AppController {
     this.dispatch((dispatch, getState) => {
       const state = getState();
       const userId = state.currentUserId;
-      const roomId = state.currentRoomId;
       const stateFlags = state.stateFlags;
       if (userId == null ||
-        roomId == null ||
         stateFlags.joiningRoom ||
         stateFlags.leavingRoom
       ) {
@@ -385,12 +368,11 @@ export class AppController {
 
     });
   }
-  enterAnswerQuestionUi(roomInfo: RoomInfo, questionInfo: QuestionInfo) {
+  enterAnswerQuestionUi(questionInfo: QuestionInfo) {
     this.dispatch({
       type: 'MODE_SUBMODE_SWITCH_TO',
       subMode: 'answer-question',
       params: {
-        roomInfo,
         questionInfo,
       },
     });
@@ -417,10 +399,7 @@ export class AppController {
   enterRoomDetailsUi(roomInfo: RoomInfo) {
     this.dispatch({
       type: 'MODE_SUBMODE_SWITCH_TO',
-      subMode: 'edit-room-details',
-      params: {
-        roomInfo,
-      },
+      subMode: 'edit-room-details'
     });
   }
   leaveRoomSubUi() {
@@ -429,7 +408,7 @@ export class AppController {
       subMode: undefined,
     });
   }
-  upVoteQuestion(questionId: string, removeUpvote: boolean) {
+  upVoteQuestion(roomId: string, questionId: string, removeUpvote: boolean) {
     if(!this.isWebsocketConnected()) {
       // make sure we only upVote questions when
       // we are connected to websocket
@@ -438,10 +417,8 @@ export class AppController {
     this.dispatch((dispatch, getState) => {
       const state = getState();
       const userId = state.currentUserId;
-      const roomId = state.currentRoomId;
       const stateFlags = state.stateFlags;
       if (userId == null ||
-        roomId == null ||
         stateFlags.joiningRoom ||
         stateFlags.leavingRoom
       ) {

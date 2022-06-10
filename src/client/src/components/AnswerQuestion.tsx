@@ -1,10 +1,11 @@
 import { useState } from "react";
+import TimeAgo from "react-timeago";
 import './AnswerQuestion.css';
 import { Modal } from "../util/components/Modal";
 import { useAppState } from "../state/components/AppStateProviders";
-import { QuestionInfo, RoomInfo } from "../../../data/src";
-import TimeAgo from "react-timeago";
+import { QuestionInfo } from "../../../data/src";
 import { useAppController } from "../state/components/AppControllerProvider";
+import { useRoomInfo } from "../state/components/RoomInfoProvider";
 
 export function AnswerQuestion() {
 
@@ -12,12 +13,12 @@ export function AnswerQuestion() {
 
   const appController = useAppController();
   const appState = useAppState();
+  const roomInfo = useRoomInfo();
 
   if(appState.subMode !== 'answer-question' || appState.subModeParams == null) {
     return null;
   }
   const questionInfo: QuestionInfo = appState.subModeParams.questionInfo;
-  const roomInfo: RoomInfo = appState.subModeParams.roomInfo;
 
   const knownUsers = appState.knownUsers;
   const authorDisplayName = knownUsers[questionInfo.author]?.displayName ?? questionInfo.author;
@@ -64,7 +65,7 @@ export function AnswerQuestion() {
                 }}
                 onClick={async () => {
                   await appController.leaveRoomSubUi();
-                  await appController.answerQuestion(questionInfo.id, textAreaValue);
+                  await appController.answerQuestion(roomInfo.id, questionInfo.id, textAreaValue);
                 }}
         >Submit</button>{' '}
         <button style={{
