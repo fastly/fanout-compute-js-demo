@@ -272,12 +272,6 @@ export class AppController {
       this.wsContext.send(JSON.stringify(payload));
     });
   }
-  switchToMode(mode: string) {
-    this.dispatch({
-      type: 'MODE_SWITCH_TO',
-      mode,
-    });
-  }
   async postQuestion(questionText: string) {
     if(!this.isWebsocketConnected()) {
       return;
