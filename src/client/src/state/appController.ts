@@ -1,25 +1,23 @@
 import { ActionOrFunctionDispatcher } from "../util/reducerWithThunk";
 import { AppState, AppStateAction } from "./state";
-import { WebSocketContextValue } from "../websocket/components/WebSocketProviders";
 import { instance } from "../services/ApiServer";
-import { FullRoomInfo, generateId, QuestionInfo, RoomData, RoomInfo, UserData, UserInfo, } from "../../../data/src";
-import { WEBSOCKET_URL_BASE } from "../constants";
+import { FullRoomInfo, generateId, QuestionInfo, RoomData, UserData, UserInfo, } from "../../../data/src";
+
+type CreateRoomResult = {
+  roomDisplayName: string,
+  roomThemeColor: string,
+  userId?: string,
+} | false;
+
+type EnterUserInfoResult = {
+  userId: string,
+  asHost: boolean,
+} | false;
 
 export class AppController {
   constructor(
-    private dispatch: ActionOrFunctionDispatcher<AppState, AppStateAction>,
-    private wsContext: WebSocketContextValue,
-    private sessionId: string,
+    private dispatch: ActionOrFunctionDispatcher<AppState, AppStateAction>
   ) {}
-  isWebsocketConnected() {
-    return this.wsContext.getSocket() != null;
-  }
-  openWs(roomId: string) {
-    this.wsContext.open(WEBSOCKET_URL_BASE + '?roomId=' + roomId + (this.sessionId !== '' ? '&session=' + this.sessionId : ''));
-  }
-  closeWs() {
-    this.wsContext.close();
-  }
   testMode(enable: boolean = true) {
     this.dispatch({
       type: 'TEST_MODE',
@@ -36,156 +34,176 @@ export class AppController {
       value: asHost,
     });
   }
-  async startNewRoom(roomId: string, roomDisplayName: string, roomThemeColor: string) {
-    await this.createOrEnterRoom(roomId, true, roomDisplayName, roomThemeColor);
-  }
-  async enterRoom(roomId: string) {
-    await this.createOrEnterRoom(roomId, false, undefined, undefined);
-  }
-  async createOrEnterRoom(roomId: string, createRoom: boolean, roomDisplayName: string | undefined, roomThemeColor: string | undefined) {
+  async enterRoom(roomId: string,
+                  onCreateRoomResult: (result: CreateRoomResult) => boolean,
+                  onEnterUserInfoResult: (result: EnterUserInfoResult) => boolean,
+  ) {
+    // land in room
+    // 1. enter the room
+    // room does not exist -> 2.
+    // room exists -> 3.
+    // 2. open create room box, accept user, room ID
+    // create the room
+    // enter the room -> 5.
+    // 3. do we have a current user?
+    // no -> 4.
+    // yes -> 5.
+    // 4. open enter name box
+    // 5. people can use the UI
     await this.dispatch(async (dispatch, getState) => {
-      if(getState().stateFlags.joiningRoom || getState().stateFlags.leavingRoom) {
-        return;
-      }
-      this.dispatch({
-        type: 'APPSTATE_SET_FLAG',
-        key: 'joiningRoom',
-        value: true,
-      });
+      console.log('Attempting to land in room', roomId);
+      let roomInfoFull: FullRoomInfo;
       try {
-        let roomInfoFull: FullRoomInfo;
-        let createRoomAlreadyExisted = false;
-        try {
-          roomInfoFull = await instance.getFullRoomInfo(roomId);
-          if(createRoom) {
-            createRoomAlreadyExisted = true;
-          }
-        } catch(ex) {
-          if(createRoom) {
+        roomInfoFull = await instance.getFullRoomInfo(roomId);
+      } catch(ex) {
+        console.log('room not exist');
 
-            const roomInfo = await instance.createRoom(roomId, roomDisplayName, roomThemeColor);
-            let userInfos: UserInfo[] = [];
-            const userId = getState().currentUserId;
-            if(userId != null) {
-              try {
-                const userInfo = await instance.getUserInfo(userId);
-                userInfos.push(userInfo);
-              } catch {
-              }
-            }
+        const result = await this.doCreateRoomUi(roomId);
+        if(!onCreateRoomResult(result) || result === false) {
+          return;
+        }
 
-            roomInfoFull = {
-              userInfos,
-              questions: [],
-              roomInfo,
-            }
-          } else {
-            // If room doesn't exist, we have to create a room
-            throw 'NOTEXIST';
+        // We've provided a room friendly name,
+        // a room theme color, and (if not already provided)
+        // a username.
+
+        // Create a new room
+        const roomInfo = await instance.createRoom(roomId, result.roomDisplayName, result.roomThemeColor);
+
+        const userId = result.userId ?? getState().currentUserId;
+        if(userId == null) {
+          // This is bizarre, we should have a username by now.
+          console.log("Why don't we have a username?");
+        }
+
+        let userInfos: UserInfo[] = [];
+        if(userId != null) {
+          try {
+            const userInfo = await instance.getUserInfo(userId);
+            userInfos.push(userInfo);
+          } catch {
           }
         }
 
-        if(createRoomAlreadyExisted) {
-          // if room already exists, we say so.
-          // If room doesn't exist, we have to create a room
-          throw 'EXISTS';
-        }
+        roomInfoFull = {
+          userInfos,
+          questions: [],
+          roomInfo,
+        };
+      }
 
-        this.openWs(roomId);
-        // TODO error stuff
-        const connectPromise = new Promise<void>(resolve => {
-          this.wsContext.getSocket()?.addEventListener('message', (e) => {
-            let data: any;
-            try {
-              data = JSON.parse(e.data);
-            } catch {
-              console.log('non-JSON payload, not sure what to do, ignoring', e.data);
-            }
-            this.passiveUpdate(data);
-          })
-          this.wsContext.getSocket()?.addEventListener('open', () => {
-            resolve();
-          });
+      dispatch({
+        type: 'KNOWNROOM_SET_INFO',
+        roomId: roomInfoFull.roomInfo.id,
+        displayName: roomInfoFull.roomInfo.displayName,
+        themeColor: roomInfoFull.roomInfo.themeColor,
+      });
+
+      for(const question of roomInfoFull.questions) {
+        dispatch({
+          type: 'QUESTION_SET_INFO',
+          questionId: question.id,
+          questionText: question.questionText,
+          questionTimestamp: question.questionTimestamp,
+          author: question.author,
+          answerText: question.answerText,
+          answerTimestamp: question.answerTimestamp,
+          answerAuthor: question.answerAuthor,
+          upVotes: question.upVotes,
         });
+      }
 
-        const actions: AppStateAction[] = [];
+      for(const userInfo of roomInfoFull.userInfos) {
+        dispatch({
+          type: 'KNOWNUSER_SET_INFO',
+          userId: userInfo.id,
+          displayName: userInfo.displayName,
+        });
+      }
 
-        actions.push({
-          type: 'KNOWNROOM_SET_INFO',
-          roomId: roomInfoFull.roomInfo.id,
-          displayName: roomInfoFull.roomInfo.displayName,
-          themeColor: roomInfoFull.roomInfo.themeColor,
-        })
-
-        for(const question of roomInfoFull.questions) {
-          actions.push({
-            type: 'QUESTION_SET_INFO',
-            questionId: question.id,
-            questionText: question.questionText,
-            questionTimestamp: question.questionTimestamp,
-            author: question.author,
-            answerText: question.answerText,
-            answerTimestamp: question.answerTimestamp,
-            answerAuthor: question.answerAuthor,
-            upVotes: question.upVotes,
-          });
+      if(getState().currentUserId == null) {
+        // No user, so let's ask for one
+        const result = await this.doEnterUserInfoUi();
+        if(!onEnterUserInfoResult(result) || result === false) {
+          return;
         }
-
-        for(const userInfo of roomInfoFull.userInfos) {
-          actions.push({
+        this.setUserId(result.userId, result.asHost);
+        try {
+          const userInfo = await instance.getUserInfo(result.userId);
+          dispatch({
             type: 'KNOWNUSER_SET_INFO',
             userId: userInfo.id,
             displayName: userInfo.displayName,
           });
+        } catch {
         }
-
-        for (const action of actions) {
-          this.dispatch(action);
-        }
-
-        await connectPromise;
-
-      } finally {
-        this.dispatch({
-          type: 'APPSTATE_SET_FLAG',
-          key: 'joiningRoom',
-          value: false,
-        });
       }
     });
   }
   leaveRoom() {
-    this.dispatch(async (dispatch, getState) => {
-      if (getState().stateFlags.joiningRoom || getState().stateFlags.leavingRoom) {
-        return;
-      }
-      this.dispatch({
-        type: 'APPSTATE_SET_FLAG',
-        key: 'leavingRoom',
-        value: true,
-      });
-      try {
-        this.closeWs();
-        this.dispatch({
-          type: 'QUESTIONS_FORGET_ALL',
-        });
-        this.dispatch({
-          type: 'SET_IS_HOST',
-          value: false,
-        });
-      } finally {
-        this.dispatch({
-          type: 'APPSTATE_SET_FLAG',
-          key: 'leavingRoom',
-          value: false,
-        });
-      }
+    this.dispatch({
+      type: 'QUESTIONS_FORGET_ALL',
+    });
+    this.dispatch({
+      type: 'SET_IS_HOST',
+      value: false,
     });
   }
-  async updateUserInfo(userData: Partial<UserData>) {
-    if(!this.isWebsocketConnected()) {
-      return;
+
+  createRoomUiPromiseResolver?: ((result: CreateRoomResult) => void) | null;
+  async doCreateRoomUi(roomId: string) {
+    this.dispatch({
+      type: 'MODE_SUBMODE_SWITCH_TO',
+      subMode: 'create-room',
+      params: {
+        roomId,
+      },
+    });
+    return await new Promise<CreateRoomResult>(resolve => {
+      this.createRoomUiPromiseResolver = resolve;
+    });
+  }
+  submitCreateRoomUi(roomDisplayName: string, roomThemeColor: string, userId?: string) {
+    this.leaveRoomSubUi();
+    if (this.createRoomUiPromiseResolver != null) {
+      this.createRoomUiPromiseResolver({roomDisplayName, roomThemeColor, userId});
+      this.createRoomUiPromiseResolver = null;
     }
+  }
+  cancelCreateRoomUi() {
+    this.leaveRoomSubUi();
+    if (this.createRoomUiPromiseResolver != null) {
+      this.createRoomUiPromiseResolver(false);
+      this.createRoomUiPromiseResolver = null;
+    }
+  }
+
+  enterUserInfoUiPromiseResolver?: ((result: EnterUserInfoResult) => void) | null;
+  async doEnterUserInfoUi() {
+    this.dispatch({
+      type: 'MODE_SUBMODE_SWITCH_TO',
+      subMode: 'enter-user-info',
+    });
+    return await new Promise<EnterUserInfoResult>(resolve => {
+      this.enterUserInfoUiPromiseResolver = resolve;
+    });
+  }
+  submitEnterUserInfoUi(userId: string, asHost: boolean) {
+    this.leaveRoomSubUi();
+    if (this.enterUserInfoUiPromiseResolver != null) {
+      this.enterUserInfoUiPromiseResolver({userId, asHost});
+      this.enterUserInfoUiPromiseResolver = null;
+    }
+  }
+  cancelEnterUserInfoUi() {
+    this.leaveRoomSubUi();
+    if (this.enterUserInfoUiPromiseResolver != null) {
+      this.enterUserInfoUiPromiseResolver(false);
+      this.enterUserInfoUiPromiseResolver = null;
+    }
+  }
+
+  async updateUserInfo(userData: Partial<UserData>) {
     this.dispatch(async (dispatch, getState) => {
 
       const state = getState();
@@ -211,29 +229,10 @@ export class AppController {
         userData,
       };
 
-      this.wsContext.send(JSON.stringify(payload));
-    });
-  }
-  async startRoomCreationUi(userId: string, roomId: string) {
-    this.dispatch({
-      type: 'MODE_SUBMODE_SWITCH_TO',
-      subMode: 'room-creation',
-      params: {
-        userId,
-        roomId,
-      },
-    });
-  }
-  async leaveRoomCreationUi() {
-    this.dispatch({
-      type: 'MODE_SUBMODE_SWITCH_TO',
-      subMode: undefined,
+      // this.wsContext.send(JSON.stringify(payload));
     });
   }
   async updateRoomInfo(roomId: string, roomData: Partial<RoomData>) {
-    if(!this.isWebsocketConnected()) {
-      return;
-    }
     this.dispatch(async (dispatch, getState) => {
 
       const state = getState();
@@ -258,13 +257,10 @@ export class AppController {
         roomData,
       };
 
-      this.wsContext.send(JSON.stringify(payload));
+      // this.wsContext.send(JSON.stringify(payload));
     });
   }
   async postQuestion(roomId: string, questionText: string) {
-    if(!this.isWebsocketConnected()) {
-      return;
-    }
     this.dispatch(async (dispatch, getState) => {
 
       const state = getState();
@@ -300,13 +296,10 @@ export class AppController {
         questionText,
       };
 
-      this.wsContext.send(JSON.stringify(payload));
+      // this.wsContext.send(JSON.stringify(payload));
     });
   }
   async answerQuestion(roomId: string, questionId: string, answerText: string) {
-    if(!this.isWebsocketConnected()) {
-      return;
-    }
     this.dispatch(async (dispatch, getState) => {
 
       const state = getState();
@@ -337,15 +330,10 @@ export class AppController {
         answerText,
       };
 
-      this.wsContext.send(JSON.stringify(payload));
+      // this.wsContext.send(JSON.stringify(payload));
     });
   }
   async deleteQuestion(roomId: string, questionId: string) {
-    if(!this.isWebsocketConnected()) {
-      // make sure we only delete questions when
-      // we are connected to websocket
-      return;
-    }
     this.dispatch((dispatch, getState) => {
       const state = getState();
       const userId = state.currentUserId;
@@ -364,8 +352,7 @@ export class AppController {
         questionId,
       };
 
-      this.wsContext.send(JSON.stringify(payload));
-
+      // this.wsContext.send(JSON.stringify(payload));
     });
   }
   enterAnswerQuestionUi(questionInfo: QuestionInfo) {
@@ -377,12 +364,11 @@ export class AppController {
       },
     });
   }
-  enterDeleteQuestionUi(roomInfo: RoomInfo, questionInfo: QuestionInfo) {
+  enterDeleteQuestionUi(questionInfo: QuestionInfo) {
     this.dispatch({
       type: 'MODE_SUBMODE_SWITCH_TO',
       subMode: 'delete-question',
       params: {
-        roomInfo,
         questionInfo,
       },
     });
@@ -396,7 +382,7 @@ export class AppController {
       },
     });
   }
-  enterRoomDetailsUi(roomInfo: RoomInfo) {
+  enterRoomDetailsUi() {
     this.dispatch({
       type: 'MODE_SUBMODE_SWITCH_TO',
       subMode: 'edit-room-details'
@@ -409,11 +395,6 @@ export class AppController {
     });
   }
   upVoteQuestion(roomId: string, questionId: string, removeUpvote: boolean) {
-    if(!this.isWebsocketConnected()) {
-      // make sure we only upVote questions when
-      // we are connected to websocket
-      return;
-    }
     this.dispatch((dispatch, getState) => {
       const state = getState();
       const userId = state.currentUserId;
@@ -433,7 +414,7 @@ export class AppController {
         removeUpvote,
       };
 
-      this.wsContext.send(JSON.stringify(payload));
+      // this.wsContext.send(JSON.stringify(payload));
     });
   }
   passiveUpdate(

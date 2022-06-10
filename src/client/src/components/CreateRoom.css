@@ -1,9 +1,17 @@
 .CreateRoom {
 
-  height: 100%;
+  position: absolute;
+  left: 50%;
+  top: 28px;
+  transform: translate(-50%, 0);
+
+  width: calc( 100% - 32px );
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  background: white;
 
 }
 
@@ -28,7 +36,6 @@
 
 }
 
-
 .CreateRoom > .main-area > .form {
   margin: 32px auto;
   font-size: 20px;
@@ -41,6 +48,9 @@
   }
 }
 
+.CreateRoom > .main-area .room-id {
+  font-weight: bold;
+}
 
 .CreateRoom > .main-area > .form .form-message,
 .CreateRoom > .main-area > .form .submit-button-group {

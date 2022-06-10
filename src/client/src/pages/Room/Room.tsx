@@ -1,15 +1,19 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import './Room.css';
+import { UserInfo } from "../../../../data/src";
 import { useAppState } from "../../state/components/AppStateProviders";
-import { RoomInfo, UserInfo } from "../../../../data/src";
 import { useAppController } from "../../state/components/AppControllerProvider";
+import { useDemoSessionId } from "../../state/components/DemoSessionIdProvider";
 import { RoomInfoProvider, useRoomInfo } from "../../state/components/RoomInfoProvider";
 import { QuestionsPanel } from "../../components/QuestionsPanel";
 import { EditUserDetails } from "../../components/EditUserDetails";
 import { EditRoomDetails } from "../../components/EditRoomDetails";
 import { AnswerQuestion } from "../../components/AnswerQuestion";
 import { DeleteQuestion } from "../../components/DeleteQuestion";
+import { CreateRoom } from "../../components/CreateRoom";
+import { EnterUserInfo } from "../../components/EnterUserInfo";
+import { WEBSOCKET_URL_BASE } from "../../constants";
 
 type TitleBarProps = {
   userId: string | null;
@@ -95,6 +99,8 @@ function QuestionsArea() {
 
 export function Room() {
 
+  const webSocketRef = useRef<WebSocket | null>();
+
   // Landing in this room will cause us to switch to the room if
   // we aren't already in there.
   const navigate = useNavigate();
@@ -103,60 +109,103 @@ export function Room() {
 
   const appController = useAppController();
   const appState = useAppState();
+  const sessionId = useDemoSessionId();
 
-  const [ landing, setLanding ] = useState(false);
+  // connect the websocket
+  useEffect(() => {
+    const url = WEBSOCKET_URL_BASE + '?roomId=' + roomId + (sessionId !== '' ? '&session=' + sessionId : '');
+    console.log('Opening websocket to ' + url);
+    const webSocket = new WebSocket(url);
+    webSocket.addEventListener('message', (e) => {
+      let data: any;
+      try {
+        data = JSON.parse(e.data);
+      } catch {
+        console.warn('non-JSON payload, not sure what to do, ignoring', e.data);
+        return;
+      }
+      appController.passiveUpdate(data);
+    });
+    webSocket.addEventListener('open', () => {
+      console.log('Websocket opened.');
+      webSocketRef.current = webSocket;
+    });
+    return () => {
+      console.log('Closing websocket.');
+      webSocket.close();
+      webSocketRef.current = null;
+    };
+  }, [roomId]);
 
   useEffect(() => {
-    // land in room
-    // 1. enter the room
-    // room does not exist -> 2.
-    // room exists -> 4.
-    // 2. open create room box
-    // 3. accept user, room ID
-    // create the room
-    // enter the room -> 4.
-    // 4. open websocket
-    // 5. do we have a current user?
-    // no -> 6.
-    // yes -> 7.
-    // 6. open enter name box
-    // 7. people can use the UI
-    if(landing) {
-      console.log('ss return');
-      return;
-    }
+    console.log('Entering room');
+    let cancelEffect = false;
     (async () => {
-      setLanding(true);
-      console.log('Attempting to land in room', roomId);
-      try {
-        //await appController.enterRoom(roomId);
-        // If we get this far, we should now have a websocket
-        if(appState.currentUserId != null) {
-          console.log('user exists', appState.currentUserId);
-        } else {
-          console.log('no user');
+      await appController.enterRoom(
+        roomId,
+        (result) => {
+          if(cancelEffect) {
+            // effect has been canceled, do nothing
+            console.log("Effect canceled, do nothing");
+            return false;
+          }
+          if(result === false) {
+            // We've clicked the cancel link in the "create room" modal
+            navigate('../');
+            return false;
+          }
+          return true;
+        },
+        (result) => {
+          if(cancelEffect) {
+            // effect has been canceled, do nothing
+            console.log("Effect canceled, do nothing");
+            return false;
+          }
+          if(result === false) {
+            // We've clicked the cancel link in the "enter username" modal
+            navigate('../');
+            return false;
+          }
+          return true;
         }
-      } catch(ex) {
-        if(ex === 'NOTEXIST') {
-          console.log('room not exist');
-        }
-      } finally {
-        setLanding(false);
-      }
+      );
     })();
 
     return () => {
       console.log('Leaving room');
-      //appController.leaveRoom();
+      cancelEffect = true;
+      appController.cancelCreateRoomUi();
+      appController.cancelEnterUserInfoUi();
+      appController.leaveRoom();
     };
   }, [roomId]);
 
-  if(appState.currentRoomId == null) {
-    return null;
-  }
-
   let subComponent: ReactNode | null = null;
-  if (appState.subMode === 'edit-user-details') {
+
+  if (appState.subMode === 'create-room') {
+    subComponent = (
+      <CreateRoom
+        onSubmit={(roomDisplayName, roomThemeColor, userId) => {
+          appController.submitCreateRoomUi(roomDisplayName, roomThemeColor, userId);
+        }}
+        onCancel={() => {
+          appController.cancelCreateRoomUi();
+        }}
+      />
+    );
+  } else if (appState.subMode === 'enter-user-info') {
+    subComponent = (
+      <EnterUserInfo
+        onSubmit={(userId, asHost) => {
+          appController.submitEnterUserInfoUi(userId, asHost);
+        }}
+        onCancel={() => {
+          appController.cancelEnterUserInfoUi();
+        }}
+      />
+    );
+  } else if (appState.subMode === 'edit-user-details') {
     subComponent = (
       <EditUserDetails />
     );
