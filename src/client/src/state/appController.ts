@@ -49,6 +49,47 @@ export class AppController {
       value: asHost,
     });
   }
+  async refreshRoom(roomId: string) {
+    // refreshing room
+    let roomInfoFull: FullRoomInfo;
+    try {
+      roomInfoFull = await instance.getFullRoomInfo(roomId);
+      this.refreshRoomInfo(roomInfoFull);
+    } catch(ex) {
+    }
+  }
+  refreshRoomInfo(roomInfoFull: FullRoomInfo) {
+
+    this.dispatch({
+      type: 'KNOWNROOM_SET_INFO',
+      roomId: roomInfoFull.roomInfo.id,
+      displayName: roomInfoFull.roomInfo.displayName,
+      themeColor: roomInfoFull.roomInfo.themeColor,
+    });
+
+    for(const question of roomInfoFull.questions) {
+      this.dispatch({
+        type: 'QUESTION_SET_INFO',
+        questionId: question.id,
+        questionText: question.questionText,
+        questionTimestamp: question.questionTimestamp,
+        author: question.author,
+        answerText: question.answerText,
+        answerTimestamp: question.answerTimestamp,
+        answerAuthor: question.answerAuthor,
+        upVotes: question.upVotes,
+      });
+    }
+
+    for(const userInfo of roomInfoFull.userInfos) {
+      this.dispatch({
+        type: 'KNOWNUSER_SET_INFO',
+        userId: userInfo.id,
+        displayName: userInfo.displayName,
+      });
+    }
+
+  }
   async enterRoom(roomId: string,
                   fnCheckCancelEffect: () => boolean,
                   onCancelEnterRoom: () => void,
@@ -127,34 +168,7 @@ export class AppController {
         };
       }
 
-      dispatch({
-        type: 'KNOWNROOM_SET_INFO',
-        roomId: roomInfoFull.roomInfo.id,
-        displayName: roomInfoFull.roomInfo.displayName,
-        themeColor: roomInfoFull.roomInfo.themeColor,
-      });
-
-      for(const question of roomInfoFull.questions) {
-        dispatch({
-          type: 'QUESTION_SET_INFO',
-          questionId: question.id,
-          questionText: question.questionText,
-          questionTimestamp: question.questionTimestamp,
-          author: question.author,
-          answerText: question.answerText,
-          answerTimestamp: question.answerTimestamp,
-          answerAuthor: question.answerAuthor,
-          upVotes: question.upVotes,
-        });
-      }
-
-      for(const userInfo of roomInfoFull.userInfos) {
-        dispatch({
-          type: 'KNOWNUSER_SET_INFO',
-          userId: userInfo.id,
-          displayName: userInfo.displayName,
-        });
-      }
+      this.refreshRoomInfo(roomInfoFull);
 
       if(getState().currentUserId == null) {
         // No user, so let's ask for one

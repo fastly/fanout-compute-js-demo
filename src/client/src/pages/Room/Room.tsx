@@ -115,54 +115,90 @@ export function Room() {
 
   // connect the websocket
   useEffect(() => {
-    const url = WEBSOCKET_URL_BASE + '?roomId=' + roomId + (sessionId !== '' ? '&session=' + sessionId : '');
-    logWriter('Opening websocket to ' + url);
-    const webSocket = new WebSocket(url);
+    let webSocket: WebSocket | null = null;
 
-    // Attach logging to websocket instance
-
-    // Monkeypatch send() to write logs
-    const origWebSocketSend = webSocket.send;
-    webSocket.send = (data) => {
-      if(typeof data === 'string') {
-        logWriter("Sending message \'" + data + "\'");
-      } else {
-        logWriter("Sending binary message");
-      }
-      origWebSocketSend.call(webSocket, data);
-    };
-    webSocket.addEventListener('open', () => {
-      logWriter('> Websocket opened');
-    });
-    webSocket.addEventListener('message', (e) => {
-      logWriter('> ' + String(e.data));
-    });
-    webSocket.addEventListener('close', (e) => {
-      logWriter('> WebSocket closed: ' + JSON.stringify({code: e.code, reason: e.reason, wasClean: e.wasClean}));
-    });
-    webSocket.addEventListener('error', (e) => {
-      logWriter('> WebSocket error');
-    });
-
-    // end attach logs
-
-    webSocket.addEventListener('message', (e) => {
-      let data: any;
-      try {
-        data = JSON.parse(e.data);
-      } catch {
-        console.warn('non-JSON payload, not sure what to do, ignoring', e.data);
+    // We're going to check every second if we're connected.
+    // If not, we try connecting
+    let interval = setInterval(() => {
+      if(webSocket != null) {
         return;
       }
-      appController.passiveUpdate(data);
-    });
-    webSocket.addEventListener('open', () => {
-      appController.webSocket = webSocket;
-      webSocketRef.current = webSocket;
-    });
+
+      const url = WEBSOCKET_URL_BASE + '?roomId=' + roomId + (sessionId !== '' ? '&session=' + sessionId : '');
+      logWriter('Opening websocket to ' + url);
+      webSocket = new WebSocket(url);
+
+      // Attach logging to websocket instance
+
+      // Monkeypatch send() to write logs
+      const origWebSocketSend = webSocket.send;
+      webSocket.send = (data) => {
+        if(typeof data === 'string') {
+          logWriter("Sending message \'" + data + "\'");
+        } else {
+          logWriter("Sending binary message");
+        }
+        origWebSocketSend.call(webSocket, data);
+      };
+      webSocket.addEventListener('open', () => {
+        logWriter('> Websocket opened');
+      });
+      webSocket.addEventListener('message', (e) => {
+        logWriter('> ' + String(e.data));
+      });
+      webSocket.addEventListener('close', (e) => {
+        logWriter('> WebSocket closed: ' + JSON.stringify({code: e.code, reason: e.reason, wasClean: e.wasClean}));
+      });
+      webSocket.addEventListener('error', (e) => {
+        logWriter('> WebSocket error');
+      });
+      // end attach logs
+
+      // respond to incoming messages
+      webSocket.addEventListener('message', (e) => {
+        let data: any;
+        try {
+          data = JSON.parse(e.data);
+        } catch {
+          console.warn('non-JSON payload, not sure what to do, ignoring', e.data);
+          return;
+        }
+        appController.passiveUpdate(data);
+      });
+
+      // handle connect
+      webSocket.addEventListener('open', () => {
+        console.log('Websocket opened');
+        appController.webSocket = webSocket;
+        webSocketRef.current = webSocket;
+      });
+      // handle disconnect
+      webSocket.addEventListener('close', (e) => {
+        if(webSocket != null) {
+          webSocket.close();
+          webSocket = null;
+        }
+        console.log('Websocket closed');
+      });
+    }, 1000);
+
+    // handle coming back online
+    function onLine() {
+      if(webSocket != null) {
+        webSocket.close();
+        webSocket = null;
+      }
+    }
+
+    window.addEventListener('online', onLine);
+
     return () => {
-      logWriter('Closing websocket');
-      webSocket.close();
+      window.removeEventListener('online', onLine);
+      clearInterval(interval);
+      if(webSocket != null) {
+        logWriter('Closing websocket');
+        webSocket.close();
+      }
       webSocketRef.current = null;
       appController.webSocket = null;
     };
@@ -179,8 +215,15 @@ export function Room() {
       );
     })();
 
+    // pull info from room if it's known
+    async function onLine() {
+      await appController.refreshRoom(roomId);
+    }
+    window.addEventListener('online', onLine);
+
     return () => {
       console.log('Leaving room');
+      window.removeEventListener('online', onLine);
       cancelEffect = true;
       appController.cancelCreateRoomUi();
       appController.cancelEnterUserInfoUi();
