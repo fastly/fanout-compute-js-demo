@@ -6,7 +6,7 @@ import './index.css'
 import App from './pages/App/App';
 
 import { AppStateProviders } from "./state/components/AppStateProviders";
-import { WebSocketProviders } from "./websocket/components/WebSocketProviders";
+import { LogProviders } from "./websocket/components/LogProviders";
 import { AppControllerProvider } from "./state/components/AppControllerProvider";
 import { DemoSessionIdProvider } from "./state/components/DemoSessionIdProvider";
 import { StartScreen } from "./pages/StartScreen/StartScreen";
@@ -22,7 +22,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <DemoSessionIdProvider sessionId={sessionId}>
-      <WebSocketProviders>
+      <LogProviders>
         <BrowserRouter>
           <AppStateProviders>
             <AppControllerProvider>
@@ -35,7 +35,7 @@ root.render(
             </AppControllerProvider>
           </AppStateProviders>
         </BrowserRouter>
-      </WebSocketProviders>
+      </LogProviders>
     </DemoSessionIdProvider>
   </React.StrictMode>
 );

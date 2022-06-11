@@ -5,6 +5,7 @@ import { UserInfo } from "../../../../data/src";
 import { useAppState } from "../../state/components/AppStateProviders";
 import { useAppController } from "../../state/components/AppControllerProvider";
 import { useDemoSessionId } from "../../state/components/DemoSessionIdProvider";
+import { useLogWriter } from "../../websocket/components/LogProviders";
 import { RoomInfoProvider, useRoomInfo } from "../../state/components/RoomInfoProvider";
 import { QuestionsPanel } from "../../components/QuestionsPanel";
 import { EditUserDetails } from "../../components/EditUserDetails";
@@ -110,12 +111,41 @@ export function Room() {
   const appController = useAppController();
   const appState = useAppState();
   const sessionId = useDemoSessionId();
+  const logWriter = useLogWriter('websocket');
 
   // connect the websocket
   useEffect(() => {
     const url = WEBSOCKET_URL_BASE + '?roomId=' + roomId + (sessionId !== '' ? '&session=' + sessionId : '');
-    console.log('Opening websocket to ' + url);
+    logWriter('Opening websocket to ' + url);
     const webSocket = new WebSocket(url);
+
+    // Attach logging to websocket instance
+
+    // Monkeypatch send() to write logs
+    const origWebSocketSend = webSocket.send;
+    webSocket.send = (data) => {
+      if(typeof data === 'string') {
+        logWriter("Sending message \'" + data + "\'");
+      } else {
+        logWriter("Sending binary message");
+      }
+      origWebSocketSend.call(webSocket, data);
+    };
+    webSocket.addEventListener('open', () => {
+      logWriter('> Websocket opened');
+    });
+    webSocket.addEventListener('message', (e) => {
+      logWriter('> ' + String(e.data));
+    });
+    webSocket.addEventListener('close', (e) => {
+      logWriter('> WebSocket closed: ' + JSON.stringify({code: e.code, reason: e.reason, wasClean: e.wasClean}));
+    });
+    webSocket.addEventListener('error', (e) => {
+      logWriter('> WebSocket error');
+    });
+
+    // end attach logs
+
     webSocket.addEventListener('message', (e) => {
       let data: any;
       try {
@@ -127,12 +157,11 @@ export function Room() {
       appController.passiveUpdate(data);
     });
     webSocket.addEventListener('open', () => {
-      console.log('Websocket opened.');
       appController.webSocket = webSocket;
       webSocketRef.current = webSocket;
     });
     return () => {
-      console.log('Closing websocket.');
+      logWriter('Closing websocket');
       webSocket.close();
       webSocketRef.current = null;
       appController.webSocket = null;

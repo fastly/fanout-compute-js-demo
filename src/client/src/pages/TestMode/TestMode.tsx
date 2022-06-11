@@ -4,7 +4,7 @@ import './TestMode.css';
 import { TestApis } from "./TestApis";
 import { AppState } from "./AppState";
 import { TestActions } from "./TestActions";
-import { WebSocketsLog } from "./WebSocketsLog";
+import { WebSocketLog } from "./WebSocketLog";
 
 export function TestMode() {
 
@@ -23,7 +23,7 @@ export function TestMode() {
       <div className={"panels active-page-" + page}>
         <AppState />
         <TestActions />
-        <WebSocketsLog />
+        <WebSocketLog />
         <TestApis />
       </div>
     </div>
