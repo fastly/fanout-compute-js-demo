@@ -108,6 +108,7 @@ export class AppController {
 
         let userInfos: UserInfo[] = [];
         if(userId != null) {
+          this.setUserId(userId, true);
           try {
             const userInfo = await instance.getUserInfo(userId);
             userInfos.push(userInfo);
@@ -189,10 +190,6 @@ export class AppController {
   leaveRoom() {
     this.dispatch({
       type: 'QUESTIONS_FORGET_ALL',
-    });
-    this.dispatch({
-      type: 'SET_IS_HOST',
-      value: false,
     });
   }
 
