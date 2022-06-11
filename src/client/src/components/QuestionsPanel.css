@@ -9,6 +9,10 @@
   position: relative;
 }
 
+.QuestionsList {
+  overflow-y: auto;
+}
+
 .QuestionItem {
   position: relative;
 

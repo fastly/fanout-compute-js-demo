@@ -88,7 +88,7 @@ function QuestionsArea() {
     `linear-gradient(0deg, ${roomInfo.themeColor} 0%, rgba(255, 255, 255,1) 50%)`;
 
   return (
-    <div className="questions-area"
+    <div className="QuestionsArea"
          style={{background: backgroundString}}
     >
       <QuestionsPanel />
