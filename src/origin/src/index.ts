@@ -7,6 +7,7 @@ import { GripExpresslyRequest, GripExpresslyResponse, ServeGrip } from "@fastly/
 import { createWebSocketControlMessage, WebSocketMessageFormat } from "@fanoutio/grip";
 import { AlreadyExistsError, HttpError, NotFoundError, Persistence } from "./services/Persistence";
 import { generateId, UserInfo } from "../../data";
+import { getStaticFileDesc, getStaticFileRoutes } from "./static-files";
 import { GRIP_URL } from "./env";
 
 const serveGrip = new ServeGrip({
@@ -402,8 +403,24 @@ router.post('/api/websocket', async (req: GripExpresslyRequest, res: GripExpress
   res.sendStatus(204);
 });
 
-router.get('/', async (req, res) => {
-  res.end('OK');
-});
+// Serve static files
+for(const route of getStaticFileRoutes()) {
+  const handler = async(req, res: EResponse) => {
+
+    const sessionId = req.query.get('session');
+
+    const message = (route === '*') ? 'index.html' : route;
+    logDemo(sessionId, 'Serving ' + message);
+    console.log('Serving', message);
+
+    const desc = getStaticFileDesc(route)!;
+    res.set('Content-Type', desc.contentType);
+    res.withStatus(200);
+    res.send(desc.content);
+  };
+
+  router.head(route, handler);
+  router.get(route, handler);
+}
 
 router.listen();

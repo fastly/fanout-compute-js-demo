@@ -6,7 +6,8 @@
   "packageManager": "pnpm@7.1.9",
   "scripts": {
     "dev": "webpack serve --port 3000 --history-api-fallback",
-    "build": "NODE_ENV=production webpack && cp ./build/* ../demo-frontend/src/rsrc"
+    "build": "NODE_ENV=production webpack && pnpm rename-build-files && cp ./build/* ../origin/src/rsrc",
+    "rename-build-files": "find ./build -not -name '*.txt' -type f -exec mv '{}' '{}.txt' ';'"
   },
   "devDependencies": {
     "@types/react": "^18.0.9",

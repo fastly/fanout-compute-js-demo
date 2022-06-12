@@ -1,5 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
+const btoa = require("btoa");
 const { ProvidePlugin } = webpack;
 
 module.exports = {
@@ -22,6 +23,15 @@ module.exports = {
       {
         test: /\.(txt|html)/,
         type: "asset/source",
+      },
+      {
+        test: /\.(png)/,
+        type: "asset/inline",
+        generator: {
+          dataUrl: content => {
+            return btoa(content);
+          },
+        }
       },
     ],
   },

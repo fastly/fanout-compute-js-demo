@@ -28,13 +28,12 @@ fn log_demo(session_id: Option<&str>, msg: &str) {
 
 fn main() -> Result<(), Error> {
 
-    log_fastly::init_simple("demo_logs", log::LevelFilter::Info);
-
     let req = Request::from_client();
-    let session_id = req.get_query_parameter("session");
 
     // Upgrade websocket requests
     if let Some("websocket") = req.get_header_str("Upgrade") {
+        log_fastly::init_simple("demo_logs", log::LevelFilter::Info);
+        let session_id = req.get_query_parameter("session");
         log_demo(session_id, "Upgrading websocket connection");
         return Ok(req.upgrade_websocket("edge_app")?);
     }
@@ -50,56 +49,5 @@ fn main() -> Result<(), Error> {
         );
     }
 
-    // GET/HEAD for Static files
-    match req.get_method() {
-        &Method::GET | &Method::HEAD => (),
-        _ => {
-            return Ok(
-                Response::from_status(StatusCode::METHOD_NOT_ALLOWED)
-                    .with_header(header::ALLOW, "GET, HEAD")
-                    .with_body_text_plain("This method is not allowed\n")
-                    .send_to_client()
-            )
-        }
-    };
-
-    let response = Response::from_status(200);
-
-    let response_with_content = match path {
-        "/main.js" => {
-            response
-                .with_content_type(mime::APPLICATION_JAVASCRIPT_UTF_8)
-                .with_body(include_str!("rsrc/main.js"))
-        }
-        "/main.css" => {
-            response
-                .with_content_type(mime::TEXT_CSS_UTF_8)
-                .with_body(include_str!("rsrc/main.css"))
-        }
-        "/robots.txt" => {
-            response
-                .with_content_type(mime::TEXT_PLAIN_UTF_8)
-                .with_body(include_str!("robots.txt"))
-        }
-        "/.well-known/fastly/demo-manifest" => {
-            response
-                .with_content_type(mime::TEXT_PLAIN_UTF_8)
-                .with_body(include_str!("demo-manifest"))
-        }
-        "/images/screenshot.png" => {
-            let bytes = include_bytes!("screenshot.png").to_vec();
-            response
-                .with_content_type(mime::IMAGE_PNG)
-                .with_body(bytes)
-        }
-        _ => {
-            // incl. index.html
-            log_demo(session_id, "Sending index.html");
-            response
-                .with_content_type(mime::TEXT_HTML_UTF_8)
-                .with_body(include_str!("rsrc/index.html"))
-        }
-    };
-
-    Ok(response_with_content.send_to_client())
+    return Ok(req.send("edge_app")?.send_to_client());
 }
