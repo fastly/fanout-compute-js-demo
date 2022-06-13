@@ -67,6 +67,9 @@ export class AppController {
       themeColor: roomInfoFull.roomInfo.themeColor,
     });
 
+    this.dispatch({
+      type: 'QUESTIONS_FORGET_ALL',
+    });
     for(const question of roomInfoFull.questions) {
       this.dispatch({
         type: 'QUESTION_SET_INFO',
