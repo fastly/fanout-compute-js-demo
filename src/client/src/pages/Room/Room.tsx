@@ -167,10 +167,12 @@ export function Room() {
       });
 
       // handle connect
-      webSocket.addEventListener('open', () => {
+      webSocket.addEventListener('open', async () => {
         console.log('Websocket opened');
         appController.webSocket = webSocket;
         webSocketRef.current = webSocket;
+        console.log('Fetching room info');
+        await appController.refreshRoom(roomId);
       });
       // handle disconnect
       webSocket.addEventListener('close', (e) => {
@@ -182,18 +184,7 @@ export function Room() {
       });
     }, 1000);
 
-    // handle coming back online
-    function onLine() {
-      if(webSocket != null) {
-        webSocket.close();
-        webSocket = null;
-      }
-    }
-
-    window.addEventListener('online', onLine);
-
     return () => {
-      window.removeEventListener('online', onLine);
       clearInterval(interval);
       if(webSocket != null) {
         logWriter('Closing websocket');
@@ -215,15 +206,8 @@ export function Room() {
       );
     })();
 
-    // pull info from room if it's known
-    async function onLine() {
-      await appController.refreshRoom(roomId);
-    }
-    window.addEventListener('online', onLine);
-
     return () => {
       console.log('Leaving room');
-      window.removeEventListener('online', onLine);
       cancelEffect = true;
       appController.cancelCreateRoomUi();
       appController.cancelEnterUserInfoUi();
