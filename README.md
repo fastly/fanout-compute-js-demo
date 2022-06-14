@@ -237,16 +237,16 @@ at the edge.
 
 ## Running the Demo Locally
 
-[`fastly compute serve`](https://developer.fastly.com/learning/compute/testing/#running-a-local-testing-server) is used to
-run and develop Compute@Edge programs locally. This command can be used to serve the `origin` app, but the local development
-server does not include Fastly Fanout features.
+To run this demo, you will need Node.js (>= 16.9), Fastly CLI, and Docker.
+
+Fastly's [local development server](https://developer.fastly.com/learning/compute/testing/#running-a-local-testing-server)
+is typically used to run and develop Compute@Edge programs locally. However, this development server does not include
+Fastly Fanout features. For this reason, we use it for `origin`, but it cannot be used to run `demo-frontend`.
 
 The open-source [Pushpin server](https://pushpin.org) does exactly what we need here. Pushpin provides exactly the same
 functionality as `demo-frontend` described above. The [/pushpin](./pushpin) directory in this repo contains files that
 will help you to run Pushpin. Pushpin is provided as a Docker configuration to provide better compatibility, especially
 with ARM Macs.
-
-To run this demo, you will need Node.js (>= 16.9), Fastly CLI, and Docker.
 
 1. Check out a copy of this repository.
 2. If you don't have [Corepack](https://github.com/nodejs/corepack#readme) enabled, enable it with `corepack enable`.
@@ -255,14 +255,14 @@ To run this demo, you will need Node.js (>= 16.9), Fastly CLI, and Docker.
 
 Next, you will need to run these apps, in separate Terminal windows:
 
-| Component     | Directory           | Address                                                          | Command      |
-|---------------|---------------------|------------------------------------------------------------------|--------------|
-| Pushpin       | `/src/pushpin`      | http://localhost:7999/ <br />(Publisher: http://localhost:5561/) | `pnpm start` |
-| `persistence` | `/src/persistence`  | http://localhost:3001/                                           | `pnpm dev`   |
-| `origin`      | `/src/origin`       | http://localhost:8000/                                           | `pnpm dev`   |
-| `client`      | `/src/client`       | http://localhost:3000/                                           | `pnpm dev`   |
+| Component                                        | Directory          | Command      | Address                                                          |
+|--------------------------------------------------|--------------------|--------------|------------------------------------------------------------------|
+| Pushpin                                          | `/pushpin`         | `pnpm start` | http://localhost:7999/ <br />(Publisher: http://localhost:5561/) |
+| `persistence` <br />(Node.js)                    | `/src/persistence` | `pnpm dev`   | http://localhost:3001/                                           |
+| `origin` <br />(Fastly local development server) | `/src/origin`      | `pnpm dev`   | http://localhost:8000/                                           |
+| `client` <br />(Webpack development Server)      | `/src/client`      | `pnpm dev`   | http://localhost:3000/                                           |
 
-Once the components are all running, open [http://localhost:3000/](http://localhost:3000/) in your browser.
+Once all the components are running, open [http://localhost:7999/](http://localhost:7999/) in your browser.
 
 ### Constants
 
@@ -270,7 +270,7 @@ In each component, constants are defined to help the components find each other.
 
 #### Pushpin
 
-`/src/pushpin/config/routes`:
+`/pushpin/config/routes`:
 ```
 *,as_host=localhost:8000 host.docker.internal:8000,over_http
 ```
