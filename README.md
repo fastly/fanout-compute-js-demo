@@ -47,10 +47,10 @@ Try:
 * The person who created the room, or anyone who checked `join as host` on the entry screen, will see buttons to reply
   to questions. Submit an answer to a question. The answer shows up on everyone else's screen.
 
-* If a host thinks a question is inappropriate, they can delete it. The question disappears from everyone's screen right away.
+* If a host thinks a question is irrelevant, they can delete it. The question disappears from everyone's screen right away.
 
-* If you're a host, you can tap the pencil next to the room name to edit the name and color theme of a room. Those changes
-  are seen by other users too.
+* If you're a host, you can tap the pencil icon next to the room name to edit the name and color theme of a room. Those
+  changes are seen by other users too.
 
 * Finally, you can change the way your own name is displayed. Tap the down arrow by your username up top, and enter a new name.
   Everyone will see those changes right away.
@@ -59,21 +59,42 @@ Try:
 
 This app comprises four components:
 
-| Path                                     | Component       | Description                                                                                                                                                                                                                                                                               |
-|------------------------------------------|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| /src[/client](/src/client)               | `client`        | The client app that users interact with. This app is simply an interface for displaying data and interacting with the API (`demo-frontend` proxying to `origin`). Written in TypeScript, with React. Built into static output files by Webpack, and eventually served by `demo-frontend`. |
-| /src[/demo-frontend](/src/demo-frontend) | `demo-frontend` | The internet-facing website, running on Compute@Edge. Serves application static files (`client`) and forwards API requests to `origin`. Among this is the ability to upgrading applicable connections to WebSocket. Written in Rust.                                                      |
-| /src[/origin](/src/origin)               | `origin`        | Handles API requests for the application, including a handler for WebSockets, running on Compute@Edge. Written in TypeScript.                                                                                                                                                             |
-| /src[/persistence](/src/persistence)     | `persistence`   | An in-memory store of the data used by the application. Written in TypeScript, and should be run on a Node.js server.                                                                                                                                                                     |
+| Path                                     | Component       | Description                                                                                                                                                                                       |
+|------------------------------------------|-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| /src[/demo-frontend](/src/demo-frontend) | `demo-frontend` | The visitor-facing edge application, running on Compute@Edge. Forwards requests to `origin`. Applicable Websocket connections are upgraded and forwarded as HTTP-over-WebSocket. Written in Rust. |
+| /src[/client](/src/client)               | `client`        | The client app that users interact with. This app is an interface that works with `origin`'s REST and WebSocket APIs. Written in TypeScript, with React.                                          |
+| /src[/origin](/src/origin)               | `origin`        | Serves the static files that make up `client`, and handles API requests for the application, including a handler for WebSockets. Running on Compute@Edge, written in TypeScript.                  |
+| /src[/persistence](/src/persistence)     | `persistence`   | An in-memory store of the data used by the application. Written in TypeScript, runs on Node.js.                                                                                                   |
 
 ## How it works
 
-When the visitor first opens `demo-frontend` in their browser, the static files that make up the `client` app are downloaded,
-and the visitor can interact with the app. The `client` app is written as a React app that opens a WebSocket connection to the
-`/api/websocket?roomId=<roomname>` endpoint on `demo-frontend`. Once the user is in a room, interactions with the app are
-sent over the WebSocket.
+The browser interacts with [https://qa-websockets-demo.edgecompute.app/](https://qa-websockets-demo.edgecompute.app/),
+which corresponds to `demo-frontend` in the table above. This is a Compute@Edge app (written in Rust) that forwards
+requests to `origin` (referred to by the backend name `edge_app`). Standard HTTP requests (static files and API requests) are
+forwarded through directly. WebSocket requests are upgraded, and the connection is held open, with traffic over that
+connection forwarded as WebSocket-over-HTTP requests.
 
-`demo-frontend` is a Compute@Edge app (written in Rust) that forwards API requests to `origin`.
+When the visitor first opens the application in their browser, the static files that make up the `client` app are downloaded,
+and the visitor can begin to interact with the app.
+
+```mermaid
+sequenceDiagram
+    participant browser
+    participant demo_frontend as demo-frontend
+    participant origin
+    rect rgba(127, 127, 127, .1)
+      browser->>demo_frontend: visitor accesses URL
+      opt If not already cached 
+        demo_frontend->>origin: fetch client app files
+        origin->>demo_frontend: client app files
+      end  
+      demo_frontend->>browser: client app files
+      Note over browser, origin: Request for client app
+    end
+```
+
+The `client` app is written as a React app. The app makes informational requests, such as obtaining state about a room or
+a user, over normal HTTP requests.
 
 ```mermaid
 sequenceDiagram
@@ -89,10 +110,15 @@ sequenceDiagram
     end
 ```
 
-When a client sends a request to open a WebSocket, that request is 'upgraded' by the `upgrade_websocket` as it is forwarded.
-After this upgrade, Fastly Fanout will hold and continue to hold the WebSocket connection with the client. Moreover, it will
-translate any WebSocket messages into HTTP, via the [WebSocket-Over-HTTP Protocol](https://pushpin.org/docs/protocols/websocket-over-http/).
-Therefore, together with the other REST API calls that are forwarded, all API calls are HTTP requests by the time they reach
+Once the user is in a room, the app opens a WebSocket connection to the `/api/websocket?roomId=<roomname>` endpoint.
+Unlike the HTTP requests, these connections are held open. Realtime updates, such as new questions, new answers, upvotes,
+etc. are sent and received over the connection.
+
+When `demo-frontend` receives a request to open a WebSocket, it calls `req.upgrade_websocket("edge_app")` to 'upgrade' that
+request. `edge_app` is the name of the backend that refers to `origin` as configured in the Fastly service.
+After this upgrade, Fastly will continue to hold the WebSocket connection with the client. Moreover, it will translate
+any WebSocket events and messages over that connection into HTTP requests, via the [WebSocket-Over-HTTP Protocol](https://pushpin.org/docs/protocols/websocket-over-http/).
+Therefore, together with the other requests described above, all requests are HTTP requests by the time they reach
 `origin`.
 
 ```mermaid
@@ -127,11 +153,11 @@ sequenceDiagram
     end
 ```
 
-`origin` is written as a Compute@Edge app in JavaScript. This app uses Fastly's [Expressly](https://github.com/fastly/expressly)
-for routing, and `js-serve-grip-expressly` as a middleware library to work with [GRIP](https://pushpin.org/docs/protocols/grip/),
-the protocol used by Fastly Fanout for realtime. This middleware is able to discern whether an incoming request has
-come through Fastly and has been upgraded. And if so, it parses relevant headers and WebSocket messages into objects
-that are easy to interact with.
+`origin` is written as a Compute@Edge app in TypeScript. This app uses [@fastly/expressly](https://github.com/fastly/expressly)
+for routing, with [`@fastly/serve-grip-expressly`](https://github.com/fastly/js-serve-grip-expressly) as middleware to
+work with [GRIP](https://pushpin.org/docs/protocols/grip/), the protocol used by Fastly Fanout for realtime. This
+middleware is able to discern whether an incoming request has come through Fastly Fanout. And if so, it parses relevant
+headers and WebSocket messages into objects that are easy to interact with.
 
 ```mermaid
 flowchart TD
@@ -151,12 +177,12 @@ flowchart TD
 ```
 
 The `POST /api/websocket` route is central, as it handles all WebSocket activity. It's important to note that this route is called
-once for every activity that comes in over that WebSocket over its lifetime between a single browser window and Fastly,
-including connecting and disconnecting, as well as the individual messages sent from the client. In this app, this route
+once for every activity that comes in over that WebSocket over its lifetime between a single visitor and Fastly, including
+connecting and disconnecting, as well as the individual messages sent from the visitor. In this app, this route
 handler handles a new connection by registering it with a channel name, and then iterating any incoming WebSocket messages
 to individually process them. Some of this processing will, in turn, result in a need to broadcast messages to all connected
 clients. For this purpose, it uses the underlying GRIP mechanism to post a message, tagged with the channel name, to a
-publishing endpoint (identified by a GRIP_URL).
+publishing endpoint (identified by a `GRIP_URL`).
 
 ```mermaid
 flowchart TD
@@ -196,28 +222,88 @@ flowchart TD
   end
 ```
 
-Sending to the publishing endpoint will cause Fastly to propagate this message to all `client` instances connected and
-listening on that channel. The `client` now handles the WebSocket message received from the server, by updating local
-state and UI.
-
-Publishing messages is not limited to during the processing of a WebSocket message. Although the `origin` program
-in this example application does not perform them outside this process, any application that knows the publisher
-secret may publish messages at any time. Because the `GRIP_URL` encodes this secret, you need to keep it safe and treat it
-as you would any other access token.
+Making a request to the publishing endpoint will cause Fastly to propagate this message to all WebSockets connected and
+listening on the specified channel. The `client` app handles the WebSocket message received from the server, by updating
+local state and UI.
 
 Keep in mind these WebSocket connections are not peer-to-peer, but rather server-client. When realtime activity occurs,
-such as when a visitor submits a question, or when the host submits an answer, the messages travels from that user's
-browser window through the WebSocket to Fastly. `origin` handles the request, at the edge, sometimes issuing a message
-to the publisher endpoint. In any case, all messaging takes place between the browser and Fastly, and then from Fastly to
-the many other browsers whose WebSocket connections are held by Fastly.
+such as when a visitor submits a question, or when the host submits an answer, the messages travels from that visitor
+through the WebSocket to Fastly. `origin` handles the request, sometimes issuing a message to the publisher endpoint.
+In any case, all messaging takes place between the browser and Fastly, and then from Fastly to the many other browsers
+whose WebSocket connections are held by Fastly.
+
+Note that `origin` is itself an application running on Compute@Edge. This means that all business logic for this app runs
+at the edge.
 
 ## Running the Demo Locally
 
-In order to run the demo locally, you will need to replace the functionality of `demo-frontend` with the open-source
-[Pushpin server](https://pushping.org). The [/pushpin](./pushpin) directory contains files that will help you to run
-Pushpin.
+[`fastly compute serve`](https://developer.fastly.com/learning/compute/testing/#running-a-local-testing-server) is used to
+run and develop Compute@Edge programs locally. This command can be used to serve the `origin` app, but the local development
+server does not include Fastly Fanout features.
 
-TODO: More details here.
+The open-source [Pushpin server](https://pushpin.org) does exactly what we need here. Pushpin provides exactly the same
+functionality as `demo-frontend` described above. The [/pushpin](./pushpin) directory in this repo contains files that
+will help you to run Pushpin. Pushpin is provided as a Docker configuration to provide better compatibility, especially
+with ARM Macs.
+
+To run this demo, you will need Node.js (>= 16.9), Fastly CLI, and Docker.
+
+1. Check out a copy of this repository.
+2. If you don't have [Corepack](https://github.com/nodejs/corepack#readme) enabled, enable it with `corepack enable`.
+3. `pnpm install`
+4. `pnpm build-all`
+
+Next, you will need to run these apps, in separate Terminal windows:
+
+| Component     | Directory           | Address                                                          | Command      |
+|---------------|---------------------|------------------------------------------------------------------|--------------|
+| Pushpin       | `/src/pushpin`      | http://localhost:7999/ <br />(Publisher: http://localhost:5561/) | `pnpm start` |
+| `persistence` | `/src/persistence`  | http://localhost:3001/                                           | `pnpm dev`   |
+| `origin`      | `/src/origin`       | http://localhost:8000/                                           | `pnpm dev`   |
+| `client`      | `/src/client`       | http://localhost:3000/                                           | `pnpm dev`   |
+
+Once the components are all running, open [http://localhost:3000/](http://localhost:3000/) in your browser.
+
+### Constants
+
+In each component, constants are defined to help the components find each other. 
+
+#### Pushpin
+
+`/src/pushpin/config/routes`:
+```
+*,as_host=localhost:8000 host.docker.internal:8000,over_http
+```
+
+#### Origin
+
+`/src/origin/src/env.ts`:
+```javascript
+export const GRIP_URL = 'http://localhost:5561/?backend=grip-publisher';
+export const PERSISTENCE_URL_BASE = 'http://localhost:3001/';
+export const PERSISTENCE_BACKEND = 'backend-persistence';
+```
+
+`/src/origin/fastly.toml`:
+```toml
+[local_server]
+
+  [local_server.backends]
+
+    [local_server.backends.grip-publisher]
+      url = "http://localhost:5561/"
+
+    [local_server.backends.backend-persistence]
+      url = "http://localhost:3001/"
+```
+
+#### Client
+
+`/src/clients/src/constants.ts`:
+```javascript
+export const WEBSOCKET_URL_BASE = 'ws://localhost:7999/api/websocket';
+export const API_URL_BASE = 'http://localhost:7999/';
+```
 
 ## Issues
 
