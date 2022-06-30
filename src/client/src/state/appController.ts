@@ -33,12 +33,6 @@ export class AppController {
     }
   }
 
-  testMode(enable: boolean = true) {
-    this.dispatch({
-      type: 'TEST_MODE',
-      value: enable,
-    });
-  }
   setUserId(userId: string, asHost: boolean) {
     this.dispatch({
       type: 'USER_SET_ID',
