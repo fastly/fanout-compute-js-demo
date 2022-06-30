@@ -20,59 +20,9 @@ export class NotFoundError extends Error {}
 export class AlreadyExistsError extends Error {}
 
 class PersistenceApiServer implements PersistenceServer {
-  _knownRooms: Record<string, RoomInfo> = {
-    'room-foo': {
-      id: 'room-foo',
-      displayName: 'Foo Room',
-      themeColor: '#038cfc',
-    },
-    'room-bar': {
-      id: 'room-bar',
-      displayName: 'Bar Room',
-      themeColor: '#f5429b',
-    },
-    'room-baz': {
-      id: 'room-baz',
-      displayName: 'Baz Room',
-      themeColor: '#188c2d',
-    },
-  };
-
-  _knownUsers: Record<string, UserInfo> = {
-    'jappleseed': {
-      id: 'jappleseed',
-      displayName: 'Johnny Appleseed',
-    },
-    'prabbit': {
-      id: 'prabbit',
-      displayName: 'Peter Rabbit',
-    },
-  };
-
-  _questions: Record<string, QuestionInfo[]> = {
-    'room-foo': [
-      {
-        id: '64fc25ad1f71466a',
-        questionText: 'When will be the next event?',
-        questionTimestamp: new Date('2022-05-29T09:00:00+09:00'),
-        author: 'jappleseed',
-        upVotes: ['jappleseed'],
-        answerText: 'It will be on Jun 3, 2002',
-        answerTimestamp: new Date('2022-05-29T09:05:00+09:00'),
-        answerAuthor: 'prabbit',
-      },
-      {
-        id: '140ca1af98094469',
-        questionText: 'How\'s the weather?',
-        questionTimestamp: new Date('2022-05-29T09:01:00+09:00'),
-        author: 'jappleseed',
-        upVotes: ['jappleseed', 'prabbit'],
-        answerText: null,
-        answerTimestamp: null,
-        answerAuthor: null,
-      },
-    ],
-  };
+  _knownRooms: Record<string, RoomInfo> = {};
+  _knownUsers: Record<string, UserInfo> = {};
+  _questions: Record<string, QuestionInfo[]> = {};
 
   _subs: Record<string, Set<string>> = {};
 
