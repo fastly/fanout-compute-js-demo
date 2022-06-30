@@ -68,6 +68,8 @@ This app comprises four components:
 
 ## How it works
 
+Note: The diagrams in this section may not render on the GitHub mobile app. If you do not see them, please use a web browser to view this page.
+
 The browser interacts with [https://qa-websockets-demo.edgecompute.app/](https://qa-websockets-demo.edgecompute.app/),
 which corresponds to `demo-frontend` in the table above. This is a Compute@Edge app (written in Rust) that forwards
 requests to `origin` (referred to by the backend name `edge_app`). Standard HTTP requests (static files and API requests) are
