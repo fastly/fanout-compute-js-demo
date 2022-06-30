@@ -12,9 +12,14 @@ import { DemoSessionIdProvider } from "./state/components/DemoSessionIdProvider"
 import { StartScreen } from "./pages/StartScreen/StartScreen";
 import { Room } from "./pages/Room/Room";
 
+const params = (new URL(document.location.toString())).searchParams;
+
 // use "session" from query parameter
-let params = (new URL(document.location.toString())).searchParams;
-let sessionId = params.get("session") ?? '';
+const sessionId = params.get("session") ?? '';
+
+// use "hideInfo" from query parameter
+const hideInfo = params.get("hideInfo") === 'yes';
+console.log('hideInfo', hideInfo);
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -27,7 +32,7 @@ root.render(
           <AppStateProviders>
             <AppControllerProvider>
               <Routes>
-                <Route path="/" element={<App />}>
+                <Route path="/" element={<App hideInfo={hideInfo} />}>
                   <Route index element={<StartScreen />}/>
                   <Route path=":roomId" element={<Room />}/>
                 </Route>

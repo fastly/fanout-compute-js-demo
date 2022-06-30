@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
 import './App.css';
 
@@ -12,14 +12,20 @@ function Info() {
         Source code <a target="_blank" href="https://github.com/fastly/fanout-compute-js-demo">on GitHub</a>.
       </div>
     </div>
-  )
+  );
 }
 
-function App() {
+type Props = {
+  hideInfo?: boolean,
+};
+function App(props: Props) {
+
   return (
     <div className="App">
       <Outlet />
-      <Info />
+      {!props.hideInfo ? (
+        <Info />
+      ) : null}
     </div>
   );
 }

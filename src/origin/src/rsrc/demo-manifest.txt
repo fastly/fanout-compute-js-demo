@@ -10,7 +10,7 @@ description: |
 views:
   endUser:
     mode: frame
-    href: /
+    href: /?hideInfo=yes
     height: 550
   behindTheScenes:
     mode: sse
