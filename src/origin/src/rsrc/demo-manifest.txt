@@ -1,12 +1,12 @@
 ---
 schemaVersion: 1
-title: WebSockets at the edge
+title: Fastly Fanout for WebSockets at the edge
 id: realtimeqa-websockets
 image:
   href: /images/screenshot.png
   alt: Realtime Q&A
 description: |
-  Use WebSockets at the edge to engage in bidirectional updates with very large audiences in real time.
+  Use Fastly Fanout to handle WebSockets at the edge, allowing your application to engage in bidirectional updates with very large audiences in real time.
 views:
   endUser:
     mode: frame
@@ -19,7 +19,7 @@ sessions: true
 repo: https://github.com/fastly/fanout-compute-js-demo
 ---
 
-## WebSockets at the edge
+## Using Fastly Fanout to handle WebSockets at the edge
 
 [WebSocket](https://datatracker.ietf.org/doc/html/rfc6455) is a mechanism that allows browsers to keep an open data channel with
 a server. This channel can be used to send and receive updates in real time, enhancing the user experience
@@ -70,3 +70,15 @@ The client may also send messages over that connection. Those messages arrive at
 HTTP POST requests.
 
 In this example, the origin is also a Compute@Edge app, written in JavaScript.
+
+Be sure to check out [the source code on GitHub](https://github.com/fastly/fanout-compute-js-demo).
+
+## Fastly Fanout at the Edge
+
+This WebSockets example illustrates one of the ways Fastly Fanout can be used. With Fastly Fanout, it's easy to add long-polling,
+SSE, and WebSocket support to your service, because Compute@Edge holds these long-lived connections for you at the edge, letting
+your origin do what it does best: the business logic.
+
+When your Compute@Edge service receives a long-polling, SSE, or WebSocket connection, your origin can have Fastly Fanout
+hold the connection and subscribe that connection to named channels. Then, at any later time, your origin (or any application
+that you authorize) can "publish" data, by channel, using an HTTP API endpoint.
