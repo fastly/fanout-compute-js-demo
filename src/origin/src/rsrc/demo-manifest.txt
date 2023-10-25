@@ -17,6 +17,7 @@ views:
     href: https://log-bin-dot-rd---product.uc.r.appspot.com/demo-websockets-edge
 sessions: true
 repo: https://github.com/fastly/fanout-compute-js-demo
+editUrl: https://github.com/fastly/fanout-compute-js-demo/edit/main/origin/src/rsrc/demo-manifest.txt
 ---
 
 ## Using Fastly Fanout to handle WebSockets at the edge
@@ -59,7 +60,7 @@ Implementing WebSocket support for an application has typically meant that the o
 all of these connections.
 
 With Fastly Fanout and the open [WebSocket-Over-HTTP Protocol](https://pushpin.org/docs/protocols/websocket-over-http/) standard,
-Compute@Edge holds all of these WebSocket connections for you at the edge, so that your origin can focus on business logic.
+Fastly Compute holds all of these WebSocket connections for you at the edge, so that your origin can focus on business logic.
 
 Once the client application makes a WebSocket connection, the origin subscribes that connection to any number of
 named "channels" (derived from the room name in the above example). Then, when the origin wishes to send data
@@ -69,16 +70,16 @@ that channel name.
 The client may also send messages over that connection. Those messages arrive at the origin in the form of
 HTTP POST requests.
 
-In this example, the origin is also a Compute@Edge app, written in JavaScript.
+In this example, the origin is also a Fastly Compute app, written in JavaScript.
 
 Be sure to check out [the source code on GitHub](https://github.com/fastly/fanout-compute-js-demo).
 
 ## Fastly Fanout at the Edge
 
 This WebSockets example illustrates one of the ways Fastly Fanout can be used. With Fastly Fanout, it's easy to add long-polling,
-SSE, and WebSocket support to your service, because Compute@Edge holds these long-lived connections for you at the edge, letting
+SSE, and WebSocket support to your service, because Compute holds these long-lived connections for you at the edge, letting
 your origin do what it does best: the business logic.
 
-When your Compute@Edge service receives a long-polling, SSE, or WebSocket connection, your origin can have Fastly Fanout
+When your Fastly Compute service receives a long-polling, SSE, or WebSocket connection, your origin can have Fastly Fanout
 hold the connection and subscribe that connection to named channels. Then, at any later time, your origin (or any application
 that you authorize) can "publish" data, by channel, using an HTTP API endpoint.
