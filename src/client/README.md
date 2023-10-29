@@ -1,4 +1,4 @@
-### Fanout WebSockets Compute@Edge Demo: Client Application
+### Fanout WebSockets Demo for Fastly Compute: Client Application
 
 This application is written in React and is the user interface for this demo.
 
