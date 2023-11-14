@@ -1,4 +1,4 @@
-### Fanout WebSockets Compute@Edge Demo: In-Memory Data Persistence
+### Fanout WebSockets Demo for Fastly Compute: In-Memory Data Persistence
 
 This application is written in TypeScript and is the data store for the application, to be run on Node.js.
 

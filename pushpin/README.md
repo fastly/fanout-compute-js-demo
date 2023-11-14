@@ -1,7 +1,7 @@
-# Fanout WebSockets Compute@Edge Demo: Pushpin on Docker
+# Fanout WebSockets Demo for Fastly Compute: Pushpin on Docker
 
 This directory contains a `package.json` file with scripts that allow you to easily run an instance of Pushpin,
-suitably configured for use with the Fanout WebSockets Compute@Edge Demo.
+suitably configured for use with the Fanout WebSockets Demo for Fastly Compute.
 
 ## Setup
 

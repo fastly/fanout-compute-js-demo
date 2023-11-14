@@ -1,4 +1,4 @@
-# Fanout WebSockets Compute@Edge Demo
+# Fanout WebSockets Demo for Compute
 
 This demo app shows how Fastly Fanout and the GRIP libraries can be used to serve WebSockets
 at the edge.
@@ -11,7 +11,7 @@ Implementing WebSocket support for an application has typically meant that the o
 all of these connections.
 
 With Fastly Fanout and the open [WebSocket-Over-HTTP Protocol](https://pushpin.org/docs/protocols/websocket-over-http/) standard,
-Compute@Edge holds all of these WebSocket connections for you at the edge, so that your origin can focus on business logic.
+a Compute service holds all of these WebSocket connections for you at the edge, so that your origin can focus on business logic.
 
 Once the client application makes a WebSocket connection, the origin subscribes that connection to any number of
 named "channels" (derived from the room name in the above example). Then, when the origin wishes to send data
@@ -21,7 +21,7 @@ that channel name.
 The client may also send messages over that connection. Those messages arrive at the origin in the form of
 HTTP POST requests.
 
-In this example, the origin is also a Compute@Edge app, written in JavaScript.
+In this example, the origin is also a Compute app, written in JavaScript.
 
 ## Live Demo
 
@@ -59,19 +59,19 @@ Try:
 
 This app comprises four components:
 
-| Path                                     | Component       | Description                                                                                                                                                                                       |
-|------------------------------------------|-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| /src[/demo-frontend](/src/demo-frontend) | `demo-frontend` | The visitor-facing edge application, running on Compute@Edge. Forwards requests to `origin`. Applicable Websocket connections are upgraded and forwarded as HTTP-over-WebSocket. Written in Rust. |
-| /src[/client](/src/client)               | `client`        | The client app that users interact with. This app is an interface that works with `origin`'s REST and WebSocket APIs. Written in TypeScript, with React.                                          |
-| /src[/origin](/src/origin)               | `origin`        | Serves the static files that make up `client`, and handles API requests for the application, including a handler for WebSockets. Running on Compute@Edge, written in TypeScript.                  |
-| /src[/persistence](/src/persistence)     | `persistence`   | An in-memory store of the data used by the application. Written in TypeScript, runs on Node.js.                                                                                                   |
+| Path                                     | Component       | Description                                                                                                                                                                                         |
+|------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| /src[/demo-frontend](/src/demo-frontend) | `demo-frontend` | The visitor-facing edge application, running on Fastly Compute. Forwards requests to `origin`. Applicable Websocket connections are upgraded and forwarded as HTTP-over-WebSocket. Written in Rust. |
+| /src[/client](/src/client)               | `client`        | The client app that users interact with. This app is an interface that works with `origin`'s REST and WebSocket APIs. Written in TypeScript, with React.                                            |
+| /src[/origin](/src/origin)               | `origin`        | Serves the static files that make up `client`, and handles API requests for the application, including a handler for WebSockets. Running on Fastly Compute, written in TypeScript.                  |
+| /src[/persistence](/src/persistence)     | `persistence`   | An in-memory store of the data used by the application. Written in TypeScript, runs on Node.js.                                                                                                     |
 
 ## How it works
 
 Note: The diagrams in this section may not render on the GitHub mobile app. If you do not see them, please use a web browser to view this page.
 
 The browser interacts with [https://qa-websockets-demo.edgecompute.app/](https://qa-websockets-demo.edgecompute.app/),
-which corresponds to `demo-frontend` in the table above. This is a Compute@Edge app (written in Rust) that forwards
+which corresponds to `demo-frontend` in the table above. This is a Fastly Compute app (written in Rust) that forwards
 requests to `origin` (referred to by the backend name `edge_app`). Standard HTTP requests (static files and API requests) are
 forwarded through directly. WebSocket requests are upgraded, and the connection is held open, with traffic over that
 connection forwarded as WebSocket-over-HTTP requests.
@@ -155,7 +155,7 @@ sequenceDiagram
     end
 ```
 
-`origin` is written as a Compute@Edge app in TypeScript. This app uses [@fastly/expressly](https://github.com/fastly/expressly)
+`origin` is a Compute app written in TypeScript. This app uses [@fastly/expressly](https://github.com/fastly/expressly)
 for routing, with [`@fastly/serve-grip-expressly`](https://github.com/fastly/js-serve-grip-expressly) as middleware to
 work with [GRIP](https://pushpin.org/docs/protocols/grip/), the protocol used by Fastly Fanout for realtime. This
 middleware is able to discern whether an incoming request has come through Fastly Fanout. And if so, it parses relevant
@@ -234,7 +234,7 @@ through the WebSocket to Fastly. `origin` handles the request, sometimes issuing
 In any case, all messaging takes place between the browser and Fastly, and then from Fastly to the many other browsers
 whose WebSocket connections are held by Fastly.
 
-Note that `origin` is itself an application running on Compute@Edge. This means that all business logic for this app runs
+Note that `origin` is itself an application running on Compute. This means that all business logic for this app runs
 at the edge.
 
 ## Running the Demo Locally
@@ -242,7 +242,7 @@ at the edge.
 To run this demo, you will need Node.js (>= 16.9), Fastly CLI, and Docker.
 
 Fastly's [local development server](https://developer.fastly.com/learning/compute/testing/#running-a-local-testing-server)
-is typically used to run and develop Compute@Edge programs locally. However, this development server does not include
+is typically used to run and develop Compute programs locally. However, this development server does not include
 Fastly Fanout features. For this reason, we use it for `origin`, but it cannot be used to run `demo-frontend`.
 
 The open-source [Pushpin server](https://pushpin.org) does exactly what we need here. Pushpin provides exactly the same
