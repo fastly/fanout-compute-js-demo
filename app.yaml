@@ -1,0 +1,12 @@
+runtime: nodejs20
+entrypoint: npm run start
+
+service: websocket-demo-persistence
+
+handlers:
+  - url: /.*
+    script: auto
+
+automatic_scaling:
+  min_instances: 1
+  max_instances: 1

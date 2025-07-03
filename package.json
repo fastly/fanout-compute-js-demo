@@ -2,13 +2,14 @@
   "name": "fastly-compute-js-demo",
   "private": true,
   "license": "MIT",
-  "engines": { "node": "16.x" },
+  "engines": { "node": "20.x" },
   "scripts": {
-    "build": "npm run build-apps",
+    "//build": "npm run build-apps",
     "build-apps": "npm run build-apps:persistence && npm run build-apps:client && npm run build-apps:edge",
     "build-apps:persistence": "cd persistence && npm run build",
     "build-apps:client": "cd client && npm run build",
     "build-apps:edge": "cd edge && npm run build",
-    "start": "cd persistence && npm run dev"
+    "start": "cd persistence && npm run dev",
+    "postinstall": "cd persistence && npm install"
   }
 }

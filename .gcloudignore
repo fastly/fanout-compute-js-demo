@@ -1,0 +1,10 @@
+edge/
+.node-gyp
+
+*.tsbuildinfo
+
+node_modules/
+
+# DO NOT ignore built output
+# data/build
+# persistence/build
