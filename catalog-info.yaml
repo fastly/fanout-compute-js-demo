@@ -1,0 +1,14 @@
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    github.com/project-slug: fastly/fanout-compute-js-demo
+  description: Fanout Fastly Compute JavaScript demo
+  name: fanout-compute-js-demo
+  title: fastly/fanout-compute-js-demo
+spec:
+  lifecycle: source
+  owner: group:fanout
+  type: repository
